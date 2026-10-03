@@ -1,0 +1,36 @@
+:root {
+  --sky-top: #5bb8f0;
+  --sky-bottom: #dceff8;
+  --ground: #f2c98a;
+  --pillar-lavender: #9b6ddc;
+  --pillar-coral: #ee6a8e;
+  --pillar-band: #8fd16b;
+  --crossbar: #e85a72;
+  --rope: #b9bec5;
+  --player-shell: #f4a090;
+  --lcd-bezel: #5b3a7a;
+  --lcd-screen: #4fb3e8;
+  --plum: #472858;
+  --glove-boot: #7b1f5e;
+  --arm-orange: #f5a03c;
+  --cloud: #fffaf3;
+  --cube-blue: #4fbde9;
+  --cube-purple: #8060d9;
+  --cube-pink: #ef82af;
+  --cube-green: #8edc6a;
+  --cube-yellow: #ffda51;
+  --cube-red: #ed6756;
+  --ink: #352446;
+  --focus-ring: #352446;
+
+  --radius-toy: 24px;
+  --radius-panel: 28px;
+  --radius-control: 14px;
+  --shadow-toy:
+    0 12px 24px rgb(62 37 74 / 20%), inset 2px 3px 4px rgb(255 255 255 / 48%);
+  --shadow-panel:
+    0 20px 45px rgb(68 42 73 / 18%), inset 0 2px 2px rgb(255 255 255 / 54%);
+  --ease-soft: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-curtain: cubic-bezier(0.65, 0, 0.35, 1);
+}
