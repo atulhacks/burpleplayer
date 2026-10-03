@@ -1,0 +1,188 @@
+.clay-scene {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--sky-top);
+}
+
+.stop-sky-top {
+  stop-color: var(--sky-top);
+}
+.stop-sky-bottom {
+  stop-color: var(--sky-bottom);
+}
+.stop-ground-light {
+  stop-color: var(--ground-light);
+}
+.stop-ground {
+  stop-color: var(--ground);
+}
+.stop-lavender-light {
+  stop-color: var(--pillar-lavender-light);
+}
+.stop-lavender {
+  stop-color: var(--pillar-lavender);
+}
+.stop-lavender-dark {
+  stop-color: var(--pillar-lavender-dark);
+}
+.stop-coral-light {
+  stop-color: var(--pillar-coral-light);
+}
+.stop-coral {
+  stop-color: var(--pillar-coral);
+}
+.stop-coral-dark {
+  stop-color: var(--pillar-coral-dark);
+}
+.stop-green-light {
+  stop-color: var(--pillar-green-light);
+}
+.stop-green {
+  stop-color: var(--pillar-band);
+}
+.stop-green-dark {
+  stop-color: var(--pillar-green-dark);
+}
+.stop-bar-light {
+  stop-color: var(--bar-light);
+}
+.stop-bar {
+  stop-color: var(--crossbar);
+}
+.stop-bar-dark {
+  stop-color: var(--bar-dark);
+}
+.stop-shell-light {
+  stop-color: var(--shell-highlight);
+}
+.stop-shell {
+  stop-color: var(--player-shell);
+}
+.stop-shell-dark {
+  stop-color: var(--shell-dark);
+}
+.stop-bezel-light {
+  stop-color: var(--bezel-rim);
+}
+.stop-bezel-dark {
+  stop-color: var(--lcd-bezel);
+}
+.stop-screen-light {
+  stop-color: var(--screen-light);
+}
+.stop-screen-dark {
+  stop-color: var(--lcd-screen);
+}
+.stop-cloud-light {
+  stop-color: var(--cloud-highlight);
+}
+.stop-cloud {
+  stop-color: var(--cloud);
+}
+.stop-cloud-shade {
+  stop-color: var(--cloud-shade);
+}
+.stop-rope-dark {
+  stop-color: var(--rope-shadow);
+}
+.stop-rope-light {
+  stop-color: var(--rope-light);
+}
+.stop-rope {
+  stop-color: var(--rope);
+}
+.stop-ring-dark {
+  stop-color: var(--ring-shadow);
+}
+.stop-ring-light {
+  stop-color: var(--ring-light);
+}
+.stop-ring {
+  stop-color: var(--ring);
+}
+.stop-glove-light {
+  stop-color: var(--glove-highlight);
+}
+.stop-glove {
+  stop-color: var(--glove-boot);
+}
+.stop-glove-dark {
+  stop-color: var(--glove-outline);
+}
+.stop-boot-light {
+  stop-color: var(--boot-highlight);
+}
+.stop-boot {
+  stop-color: var(--glove-boot);
+}
+.stop-boot-dark {
+  stop-color: var(--boot-outline);
+}
+.stop-button-light {
+  stop-color: var(--button-highlight);
+}
+.stop-button-dark {
+  stop-color: var(--button-shadow);
+}
+.stop-dpad-light {
+  stop-color: var(--dpad-highlight);
+}
+.stop-dpad-dark {
+  stop-color: var(--dpad-shadow);
+}
+.stop-arm-light {
+  stop-color: var(--arm-highlight);
+}
+.stop-arm-dark {
+  stop-color: var(--arm-orange);
+}
+.stop-purple-light {
+  stop-color: var(--cube-purple-light);
+}
+.stop-purple-dark {
+  stop-color: var(--cube-purple);
+}
+.stop-red-light {
+  stop-color: var(--cube-red-light);
+}
+.stop-red-dark {
+  stop-color: var(--cube-red);
+}
+.stop-base-light {
+  stop-color: var(--base-light);
+}
+.stop-base-dark {
+  stop-color: var(--base-dark);
+}
+
+.scene-cube--blue {
+  --cube-face: var(--cube-blue);
+}
+.scene-cube--purple {
+  --cube-face: var(--cube-purple);
+}
+.scene-cube--pink {
+  --cube-face: var(--cube-pink);
+}
+.scene-cube--green {
+  --cube-face: var(--cube-green);
+}
+.scene-cube--yellow {
+  --cube-face: var(--cube-yellow);
+}
+.scene-cube--red {
+  --cube-face: var(--cube-red);
+}
+.cube-front {
+  fill: var(--cube-face);
+}
+.cube-top {
+  fill: var(--cube-face);
+  filter: brightness(1.16);
+}
+.cube-side {
+  fill: var(--cube-face);
+  filter: brightness(0.78);
+}

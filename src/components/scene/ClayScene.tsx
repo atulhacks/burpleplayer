@@ -1,0 +1,782 @@
+import "./ClayScene.css";
+
+type CloudProps = {
+  x: number;
+  y: number;
+  scale?: number;
+  foreground?: boolean;
+  flip?: boolean;
+};
+
+type CubeColor = "blue" | "purple" | "pink" | "green" | "yellow" | "red";
+
+type CubeProps = {
+  x: number;
+  y: number;
+  size: number;
+  color: CubeColor;
+  rotate?: number;
+};
+
+function Cloud({
+  x,
+  y,
+  scale = 1,
+  foreground = false,
+  flip = false,
+}: CloudProps) {
+  return (
+    <g
+      className={foreground ? "cloud cloud--foreground" : "cloud"}
+      transform={`translate(${x} ${y}) scale(${flip ? -scale : scale} ${scale})`}
+    >
+      <ellipse
+        cx="0"
+        cy="21"
+        rx="128"
+        ry="47"
+        fill="var(--cloud-shadow)"
+        opacity="0.3"
+        filter="url(#cloud-shadow)"
+      />
+      <ellipse cx="-54" cy="20" rx="73" ry="67" fill="url(#cloud-gradient)" />
+      <circle cx="-19" cy="-28" r="67" fill="url(#cloud-gradient)" />
+      <circle cx="56" cy="13" r="62" fill="url(#cloud-gradient)" />
+      <ellipse cx="-2" cy="35" rx="85" ry="51" fill="url(#cloud-gradient)" />
+      <path
+        d="M-113 13c22-21 38-21 52-4M-35-62c26-19 60-3 74 24"
+        fill="none"
+        stroke="var(--cloud-highlight)"
+        strokeWidth="8"
+        strokeLinecap="round"
+        opacity="0.37"
+      />
+    </g>
+  );
+}
+
+function Cube({ x, y, size, color, rotate = 0 }: CubeProps) {
+  return (
+    <g
+      className={`scene-cube scene-cube--${color}`}
+      transform={`translate(${x} ${y}) rotate(${rotate}) scale(${size / 70})`}
+    >
+      <ellipse
+        cx="17"
+        cy="78"
+        rx="46"
+        ry="11"
+        fill="var(--ground-shadow)"
+        opacity="0.28"
+        filter="url(#ground-soft)"
+      />
+      <path d="M-30-25 20-34 43-22-7-10Z" className="cube-top" />
+      <path d="M-7-10 43-22 43 36-7 48Z" className="cube-side" />
+      <path d="M-30-25-7-10-7 48-30 31Z" className="cube-front" />
+      <path
+        d="M-26-20-12-12v50"
+        fill="none"
+        stroke="var(--cloud-highlight)"
+        strokeWidth="3"
+        opacity="0.46"
+        strokeLinecap="round"
+      />
+    </g>
+  );
+}
+
+function Pillars() {
+  return (
+    <g className="pillars" aria-hidden="true">
+      <ellipse
+        cx="190"
+        cy="1205"
+        rx="169"
+        ry="36"
+        fill="var(--ground-shadow)"
+        opacity="0.31"
+        filter="url(#ground-soft)"
+      />
+      <ellipse
+        cx="924"
+        cy="1177"
+        rx="157"
+        ry="35"
+        fill="var(--ground-shadow)"
+        opacity="0.31"
+        filter="url(#ground-soft)"
+      />
+      <path d="M35 1190h309v43H51q-16 0-16-16Z" fill="url(#base-gradient)" />
+      <path d="M783 1146h291v54H811q-28 0-28-19Z" fill="url(#base-gradient)" />
+
+      <rect
+        x="81"
+        y="708"
+        width="218"
+        height="494"
+        rx="24"
+        fill="url(#lavender-gradient)"
+      />
+      <path
+        d="M94 721c18-8 30-9 45-7v477H98q-17 0-17-18V746q0-18 13-25Z"
+        fill="var(--pillar-left-highlight)"
+        opacity="0.34"
+      />
+      <path
+        d="M270 724q26 0 29 25v420q-3 26-29 30Z"
+        fill="var(--pillar-left-shadow)"
+        opacity="0.22"
+      />
+      <rect
+        x="81"
+        y="603"
+        width="218"
+        height="108"
+        rx="22"
+        fill="url(#green-gradient)"
+      />
+      <path
+        d="M88 622q16-21 48-17h147q-25 9-30 26l-1 77H99q-19-3-18-24v-53Z"
+        fill="var(--cloud-highlight)"
+        opacity="0.21"
+      />
+      <rect
+        x="80"
+        y="61"
+        width="218"
+        height="541"
+        rx="34"
+        fill="url(#lavender-gradient)"
+      />
+      <path
+        d="M86 104q10-34 54-39h114q-28 8-36 43v491H104q-24 0-24-25V130q0-17 6-26Z"
+        fill="var(--pillar-left-highlight)"
+        opacity="0.25"
+      />
+      <path
+        d="M270 74q28 7 28 37v448q-4 31-28 42Z"
+        fill="var(--pillar-left-shadow)"
+        opacity="0.27"
+      />
+      <ellipse
+        cx="137"
+        cy="77"
+        rx="9"
+        ry="14"
+        fill="var(--cloud-highlight)"
+        opacity="0.8"
+        filter="url(#sparkle-soft)"
+      />
+
+      <rect
+        x="829"
+        y="709"
+        width="215"
+        height="454"
+        rx="24"
+        fill="url(#coral-gradient)"
+      />
+      <path
+        d="M842 725q19-12 42-11v442h-31q-24-3-24-25V752q0-18 13-27Z"
+        fill="var(--pillar-right-highlight)"
+        opacity="0.34"
+      />
+      <path
+        d="M1014 719q30 7 30 32v381q-2 24-30 29Z"
+        fill="var(--pillar-right-shadow)"
+        opacity="0.18"
+      />
+      <rect
+        x="829"
+        y="608"
+        width="215"
+        height="105"
+        rx="22"
+        fill="url(#green-gradient)"
+      />
+      <path
+        d="M838 625q19-15 50-14h148q-24 10-29 34v65H853q-24-2-24-25v-39q0-15 9-21Z"
+        fill="var(--cloud-highlight)"
+        opacity="0.19"
+      />
+      <rect
+        x="829"
+        y="124"
+        width="215"
+        height="485"
+        rx="35"
+        fill="url(#coral-gradient)"
+      />
+      <path
+        d="M837 170q13-32 53-43h104q-28 11-35 42v434H851q-22 0-22-25V194q0-15 8-24Z"
+        fill="var(--pillar-right-highlight)"
+        opacity="0.25"
+      />
+      <path
+        d="M1015 135q29 8 29 37v397q-3 26-29 37Z"
+        fill="var(--pillar-right-shadow)"
+        opacity="0.23"
+      />
+      <ellipse
+        cx="907"
+        cy="138"
+        rx="7"
+        ry="11"
+        fill="var(--cloud-highlight)"
+        opacity="0.65"
+        filter="url(#sparkle-soft)"
+      />
+
+      <g transform="translate(58 718) rotate(-14)">
+        <rect
+          x="-34"
+          y="-34"
+          width="70"
+          height="71"
+          rx="6"
+          fill="url(#purple-gradient)"
+        />
+        <path
+          d="M-29-29 24-34"
+          stroke="var(--cloud-highlight)"
+          strokeWidth="5"
+          opacity="0.35"
+        />
+      </g>
+      <g transform="translate(1072 799) rotate(30)">
+        <rect
+          x="-35"
+          y="-34"
+          width="69"
+          height="68"
+          rx="7"
+          fill="url(#red-gradient)"
+        />
+        <path
+          d="M-29-29 24-34"
+          stroke="var(--cloud-highlight)"
+          strokeWidth="5"
+          opacity="0.35"
+        />
+      </g>
+    </g>
+  );
+}
+
+function Rope({ x, top }: { x: number; top: number }) {
+  return (
+    <g className="rope" aria-hidden="true">
+      <path
+        d={`M${x} ${top}V880`}
+        stroke="var(--rope-shadow)"
+        strokeWidth="17"
+        strokeLinecap="round"
+      />
+      <path
+        d={`M${x - 2} ${top}V880`}
+        stroke="url(#rope-gradient)"
+        strokeWidth="12"
+        strokeLinecap="round"
+      />
+      {Array.from({ length: 47 }, (_, index) => {
+        const y = top + 10 + index * 13;
+        return y < 873 ? (
+          <path
+            key={index}
+            d={`M${x - 7} ${y + 6}l13-9`}
+            stroke="var(--rope-weave)"
+            strokeWidth="2"
+            opacity="0.72"
+          />
+        ) : null;
+      })}
+      <ellipse
+        cx={x}
+        cy={top - 49}
+        rx="23"
+        ry="56"
+        fill="none"
+        stroke="var(--ring-shadow)"
+        strokeWidth="20"
+      />
+      <ellipse
+        cx={x - 4}
+        cy={top - 51}
+        rx="21"
+        ry="54"
+        fill="none"
+        stroke="url(#ring-gradient)"
+        strokeWidth="15"
+      />
+    </g>
+  );
+}
+
+function PixelEye({ x }: { x: number }) {
+  return (
+    <path
+      d={`M${x + 5} 610h12v4h4v18h-4v4h-12v-4h-4v-18h4Z`}
+      fill="var(--lcd-ink)"
+      shapeRendering="crispEdges"
+    />
+  );
+}
+
+function Player() {
+  return (
+    <g className="player" aria-hidden="true">
+      <path
+        d="M408 688q-9 13-5 40l12 31q9 12 24 7l15-8-17-66Z"
+        fill="url(#arm-gradient)"
+        stroke="var(--arm-shadow)"
+        strokeWidth="2"
+      />
+      <path
+        d="M731 685q17 14 13 43l-14 29q-8 13-24 6l-13-8 19-67Z"
+        fill="url(#arm-gradient)"
+        stroke="var(--arm-shadow)"
+        strokeWidth="2"
+      />
+      <path
+        d="M423 853q-12 4-13 25v21h57v-17q-2-24-19-29Z"
+        fill="url(#shell-gradient)"
+      />
+      <path
+        d="M704 850q-15 4-16 29v22h54v-26q-5-23-18-26Z"
+        fill="url(#shell-gradient)"
+      />
+      <path d="M501 855q3-18 31-18h31v68h-62Z" fill="url(#shell-gradient)" />
+      <path d="M653 852q8-17 32-17h28v70h-60Z" fill="url(#shell-gradient)" />
+
+      <path
+        d="M435 546q0-25 26-27l217 1q24 3 25 27v339q-1 29-31 31H463q-28-1-28-31Z"
+        fill="url(#shell-gradient)"
+        stroke="var(--shell-outline)"
+        strokeWidth="3"
+      />
+      <path
+        d="M436 547q3-27 25-28h30v398h-27q-30-1-30-28Z"
+        fill="var(--shell-side)"
+        opacity="0.55"
+      />
+      <path
+        d="M447 540q5-13 19-13h205q18 1 22 17H447Z"
+        fill="var(--shell-highlight)"
+        opacity="0.4"
+      />
+      <path
+        d="M458 536v367"
+        stroke="var(--shell-highlight)"
+        strokeWidth="4"
+        opacity="0.58"
+      />
+      <path
+        d="M436 547q131-6 266 0"
+        fill="none"
+        stroke="var(--shell-seam)"
+        strokeWidth="4"
+      />
+      <path
+        d="M436 558q131-6 266 0"
+        fill="none"
+        stroke="var(--shell-highlight)"
+        strokeWidth="3"
+        opacity="0.6"
+      />
+      <rect
+        x="501"
+        y="547"
+        width="181"
+        height="173"
+        rx="10"
+        fill="url(#bezel-gradient)"
+        stroke="var(--bezel-rim)"
+        strokeWidth="3"
+      />
+      <rect
+        x="525"
+        y="568"
+        width="131"
+        height="132"
+        rx="2"
+        fill="url(#screen-gradient)"
+      />
+      <path
+        d="M529 571h124v5H529Z"
+        fill="var(--cloud-highlight)"
+        opacity="0.12"
+      />
+      <PixelEye x={543} />
+      <PixelEye x={609} />
+      <path
+        d="M559 652h11v10h41v-10h11v10h-10v12h-42v-12h-11Z"
+        fill="var(--lcd-ink)"
+        shapeRendering="crispEdges"
+      />
+
+      <path
+        d="M525 773h24v21h21v24h-21v21h-24v-21h-22v-24h22Z"
+        fill="var(--dpad-shadow)"
+        opacity="0.7"
+        transform="translate(2 4)"
+      />
+      <path
+        d="M525 773h24v21h21v24h-21v21h-24v-21h-22v-24h22Z"
+        fill="url(#dpad-gradient)"
+        stroke="var(--dpad-edge)"
+        strokeWidth="3"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M528 779h18"
+        stroke="var(--cloud-highlight)"
+        strokeWidth="3"
+        opacity="0.26"
+        strokeLinecap="round"
+      />
+      <circle
+        cx="638"
+        cy="811"
+        r="16"
+        fill="var(--button-shadow)"
+        opacity="0.6"
+        transform="translate(2 4)"
+      />
+      <circle
+        cx="638"
+        cy="807"
+        r="15"
+        fill="url(#button-gradient)"
+        stroke="var(--button-outline)"
+        strokeWidth="2"
+      />
+      <circle
+        cx="676"
+        cy="798"
+        r="16"
+        fill="var(--button-shadow)"
+        opacity="0.6"
+        transform="translate(2 4)"
+      />
+      <circle
+        cx="676"
+        cy="794"
+        r="15"
+        fill="url(#button-gradient)"
+        stroke="var(--button-outline)"
+        strokeWidth="2"
+      />
+      <path
+        d="M622 870q23-24 60-30"
+        fill="none"
+        stroke="var(--shell-seam)"
+        strokeWidth="5"
+        opacity="0.5"
+      />
+      {Array.from({ length: 8 }, (_, index) => (
+        <path
+          key={index}
+          d={`M${625 + index * 8} ${867 - index * 3}l-3 12`}
+          stroke="var(--shell-seam)"
+          strokeWidth="3"
+          opacity="0.45"
+        />
+      ))}
+
+      <path d="M423 867q15-17 27 0l-6 30h-24Z" fill="url(#ring-gradient)" />
+      <rect
+        x="402"
+        y="883"
+        width="69"
+        height="33"
+        rx="8"
+        fill="url(#purple-gradient)"
+      />
+      <path d="M710 866q12-15 25 2l-4 31h-22Z" fill="url(#ring-gradient)" />
+      <rect
+        x="690"
+        y="883"
+        width="62"
+        height="34"
+        rx="8"
+        fill="url(#purple-gradient)"
+      />
+
+      <path
+        d="M501 865q16-14 41-1l31 38-12 35-55-17Z"
+        fill="url(#shell-gradient)"
+      />
+      <path
+        d="M645 863q15-13 35-4l35 39-10 37-58-18Z"
+        fill="url(#shell-gradient)"
+      />
+      <path
+        d="M517 890q14-12 35-11h29q17 1 19 19v58q-4 19-21 21h-58q-18-3-17-23v-47q0-11 13-17Z"
+        fill="url(#boot-gradient)"
+        stroke="var(--boot-outline)"
+        strokeWidth="3"
+      />
+      <path
+        d="M677 890q15-12 34-11h22q17 2 18 20v56q-4 19-20 21h-52q-18-2-19-21v-46q0-13 17-19Z"
+        fill="url(#boot-gradient)"
+        stroke="var(--boot-outline)"
+        strokeWidth="3"
+      />
+      <path
+        d="M518 891q17-9 64-8M676 891q15-9 56-7"
+        fill="none"
+        stroke="var(--boot-highlight)"
+        strokeWidth="5"
+        opacity="0.64"
+        strokeLinecap="round"
+      />
+      <path
+        d="M524 943h58m102 0h48"
+        stroke="var(--boot-seam)"
+        strokeWidth="3"
+        opacity="0.45"
+      />
+      <path
+        d="M519 961h62m99 0h51"
+        stroke="var(--boot-outline)"
+        strokeWidth="4"
+        opacity="0.4"
+      />
+
+      <path
+        d="M431 646q17-3 26 16l-2 27q-5 18-23 26l-12-9q-11-28-2-47Z"
+        fill="url(#glove-gradient)"
+        stroke="var(--glove-outline)"
+        strokeWidth="3"
+      />
+      <ellipse
+        cx="417"
+        cy="671"
+        rx="27"
+        ry="33"
+        fill="url(#glove-gradient)"
+        stroke="var(--glove-outline)"
+        strokeWidth="3"
+      />
+      <path
+        d="M438 643q16 9 13 29"
+        fill="none"
+        stroke="var(--glove-highlight)"
+        strokeWidth="5"
+        opacity="0.6"
+        strokeLinecap="round"
+      />
+      <path
+        d="M706 648q20-4 29 14l6 29q-4 19-22 24l-13-9q-13-23-8-42Z"
+        fill="url(#glove-gradient)"
+        stroke="var(--glove-outline)"
+        strokeWidth="3"
+      />
+      <ellipse
+        cx="739"
+        cy="676"
+        rx="23"
+        ry="32"
+        fill="url(#glove-gradient)"
+        stroke="var(--glove-outline)"
+        strokeWidth="3"
+      />
+      <path
+        d="M726 651q-13 9-11 24"
+        fill="none"
+        stroke="var(--glove-highlight)"
+        strokeWidth="5"
+        opacity="0.55"
+        strokeLinecap="round"
+      />
+    </g>
+  );
+}
+
+function SceneDefs() {
+  return (
+    <defs>
+      <linearGradient id="sky-gradient" x2="0" y2="1">
+        <stop offset="0" className="stop-sky-top" />
+        <stop offset="1" className="stop-sky-bottom" />
+      </linearGradient>
+      <linearGradient id="ground-gradient" x2="0" y2="1">
+        <stop offset="0" className="stop-ground-light" />
+        <stop offset="1" className="stop-ground" />
+      </linearGradient>
+      <linearGradient id="lavender-gradient" x2="1" y2="0.15">
+        <stop offset="0" className="stop-lavender-light" />
+        <stop offset="0.36" className="stop-lavender" />
+        <stop offset="1" className="stop-lavender-dark" />
+      </linearGradient>
+      <linearGradient id="coral-gradient" x2="1" y2="0.2">
+        <stop offset="0" className="stop-coral-light" />
+        <stop offset="0.48" className="stop-coral" />
+        <stop offset="1" className="stop-coral-dark" />
+      </linearGradient>
+      <linearGradient id="green-gradient" x2="1" y2="0.2">
+        <stop offset="0" className="stop-green-light" />
+        <stop offset="0.45" className="stop-green" />
+        <stop offset="1" className="stop-green-dark" />
+      </linearGradient>
+      <linearGradient id="bar-gradient" x2="0" y2="1">
+        <stop offset="0" className="stop-bar-light" />
+        <stop offset="0.5" className="stop-bar" />
+        <stop offset="1" className="stop-bar-dark" />
+      </linearGradient>
+      <linearGradient id="shell-gradient" x2="1" y2="0.85">
+        <stop offset="0" className="stop-shell-light" />
+        <stop offset="0.48" className="stop-shell" />
+        <stop offset="1" className="stop-shell-dark" />
+      </linearGradient>
+      <linearGradient id="bezel-gradient" x2="1" y2="1">
+        <stop offset="0" className="stop-bezel-light" />
+        <stop offset="1" className="stop-bezel-dark" />
+      </linearGradient>
+      <linearGradient id="screen-gradient" x2="0.8" y2="1">
+        <stop offset="0" className="stop-screen-light" />
+        <stop offset="1" className="stop-screen-dark" />
+      </linearGradient>
+      <radialGradient id="cloud-gradient" cx="0.3" cy="0.18" r="0.9">
+        <stop offset="0" className="stop-cloud-light" />
+        <stop offset="0.65" className="stop-cloud" />
+        <stop offset="1" className="stop-cloud-shade" />
+      </radialGradient>
+      <linearGradient id="rope-gradient" x2="1" y2="0">
+        <stop offset="0" className="stop-rope-dark" />
+        <stop offset="0.5" className="stop-rope-light" />
+        <stop offset="1" className="stop-rope" />
+      </linearGradient>
+      <linearGradient id="ring-gradient" x2="1" y2="0">
+        <stop offset="0" className="stop-ring-dark" />
+        <stop offset="0.5" className="stop-ring-light" />
+        <stop offset="1" className="stop-ring" />
+      </linearGradient>
+      <linearGradient id="glove-gradient" x2="1" y2="1">
+        <stop offset="0" className="stop-glove-light" />
+        <stop offset="0.5" className="stop-glove" />
+        <stop offset="1" className="stop-glove-dark" />
+      </linearGradient>
+      <linearGradient id="boot-gradient" x2="1" y2="1">
+        <stop offset="0" className="stop-boot-light" />
+        <stop offset="0.6" className="stop-boot" />
+        <stop offset="1" className="stop-boot-dark" />
+      </linearGradient>
+      <linearGradient id="button-gradient" x2="1" y2="1">
+        <stop offset="0" className="stop-button-light" />
+        <stop offset="1" className="stop-button-dark" />
+      </linearGradient>
+      <linearGradient id="dpad-gradient" x2="1" y2="1">
+        <stop offset="0" className="stop-dpad-light" />
+        <stop offset="1" className="stop-dpad-dark" />
+      </linearGradient>
+      <linearGradient id="arm-gradient" x2="1" y2="0.2">
+        <stop offset="0" className="stop-arm-light" />
+        <stop offset="1" className="stop-arm-dark" />
+      </linearGradient>
+      <linearGradient id="purple-gradient" x2="1" y2="1">
+        <stop offset="0" className="stop-purple-light" />
+        <stop offset="1" className="stop-purple-dark" />
+      </linearGradient>
+      <linearGradient id="red-gradient" x2="1" y2="1">
+        <stop offset="0" className="stop-red-light" />
+        <stop offset="1" className="stop-red-dark" />
+      </linearGradient>
+      <linearGradient id="base-gradient" x2="0" y2="1">
+        <stop offset="0" className="stop-base-light" />
+        <stop offset="1" className="stop-base-dark" />
+      </linearGradient>
+      <filter id="cloud-shadow" x="-35%" y="-35%" width="170%" height="170%">
+        <feGaussianBlur stdDeviation="15" />
+      </filter>
+      <filter id="ground-soft" x="-50%" y="-100%" width="200%" height="300%">
+        <feGaussianBlur stdDeviation="12" />
+      </filter>
+      <filter id="sparkle-soft" x="-100%" y="-100%" width="300%" height="300%">
+        <feGaussianBlur stdDeviation="3" />
+      </filter>
+      <filter id="foreground-soft" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur stdDeviation="7" />
+      </filter>
+    </defs>
+  );
+}
+
+export function ClayScene() {
+  return (
+    <svg
+      className="clay-scene"
+      viewBox="0 0 1136 1472"
+      preserveAspectRatio="xMidYMid slice"
+      role="img"
+      aria-label="A smiling pink handheld music player sits on a swing between lavender and coral pillars under a blue sky, with soft clouds and colorful toy cubes on the sand."
+    >
+      <title>BurplePlayer clay playground</title>
+      <SceneDefs />
+      <rect width="1136" height="1472" fill="url(#sky-gradient)" />
+      <g data-scene-layer="clouds-back">
+        <Cloud x={-6} y={994} scale={1.25} />
+        <Cloud x={1003} y={995} scale={1.18} flip />
+      </g>
+      <path
+        d="M0 1040Q560 1026 1136 1040V1472H0Z"
+        fill="url(#ground-gradient)"
+      />
+      <path
+        d="M0 1041Q565 1026 1136 1041"
+        fill="none"
+        stroke="var(--ground-horizon)"
+        strokeWidth="5"
+        opacity="0.24"
+      />
+      <path
+        d="M297 1174q177-18 446 16l-51 29q-276 21-472-1Z"
+        fill="var(--ground-shadow)"
+        opacity="0.18"
+        filter="url(#ground-soft)"
+      />
+      <g data-scene-layer="crossbar" aria-hidden="true">
+        <path
+          d="M274 173 865 210q21 1 21 22v21q0 24-24 23L278 239Z"
+          fill="url(#bar-gradient)"
+        />
+        <path
+          d="M294 178 855 213"
+          stroke="var(--bar-highlight)"
+          strokeWidth="10"
+          opacity="0.55"
+          strokeLinecap="round"
+        />
+      </g>
+      <Pillars />
+      <g data-scene-layer="clouds-mid">
+        <Cloud x={96} y={288} scale={1.34} />
+        <Cloud x={1048} y={471} scale={1.21} flip />
+      </g>
+      <g data-scene-layer="swing">
+        <Rope x={433} top={270} />
+        <Rope x={723} top={291} />
+        <Player />
+      </g>
+      <g data-scene-layer="cubes">
+        <Cube x={111} y={1198} size={63} color="red" rotate={-3} />
+        <Cube x={278} y={1193} size={78} color="blue" rotate={-4} />
+        <Cube x={380} y={1122} size={49} color="blue" rotate={1} />
+        <Cube x={779} y={1107} size={52} color="red" rotate={-2} />
+        <Cube x={403} y={1253} size={60} color="purple" rotate={-2} />
+        <Cube x={518} y={1307} size={69} color="pink" rotate={2} />
+        <Cube x={711} y={1342} size={72} color="yellow" rotate={-1} />
+        <Cube x={892} y={1249} size={70} color="green" rotate={2} />
+      </g>
+      <g
+        data-scene-layer="clouds-front"
+        filter="url(#foreground-soft)"
+        aria-hidden="true"
+      >
+        <Cloud x={28} y={1406} scale={1.8} foreground />
+        <Cloud x={263} y={1486} scale={1.52} foreground />
+        <Cloud x={1010} y={1492} scale={1.72} foreground flip />
+      </g>
+    </svg>
+  );
+}

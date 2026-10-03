@@ -4,7 +4,7 @@ A portrait desktop music player built with Tauri 2, Rust, React, TypeScript, Vit
 
 ## Status
 
-**Milestone 0 complete:** official Tauri 2 scaffold, portrait window, strict TypeScript, UI/backend folder map, reference asset, design tokens, ESLint, Prettier, Rust formatting, and a launchable placeholder screen. Audio playback and the illustrated scene are not implemented yet.
+**Milestones 0–1 complete:** official Tauri 2 scaffold, portrait window, strict TypeScript, UI/backend folder map, reference asset, design tokens, ESLint, Prettier, Rust formatting, and an editable static clay playground. Audio playback and interactive controls are not implemented yet.
 
 ## Development
 
@@ -37,8 +37,14 @@ On the current macOS workstation, the Command Line Tools default to an SDK whose
 - `src-tauri/src/media/` — OS media controls.
 - `src-tauri/src/ipc/` — commands and event payloads.
 
-Rust will be the source of truth for playback and library data. The current app is intentionally a milestone-0 scaffold, not a mock music player.
+Rust will be the source of truth for playback and library data. The current app is intentionally a static milestone-1 scene, not a mock music player.
+
+The scene in `src/components/scene/ClayScene.tsx` is layered SVG/CSS, not the reference image used as a background. Its separate sky, clouds, pillars, crossbar, swing, player, and cube groups are ready for the later motion and interaction passes.
+
+## Bundled fonts
+
+The interface bundles [Fredoka](https://github.com/google/fonts/tree/main/ofl/fredoka) and [Press Start 2P](https://github.com/google/fonts/tree/main/ofl/pressstart2p) locally under `src/assets/fonts/`. Both are distributed under their included SIL Open Font License files; no font CDN is used.
 
 ## Skill application plan
 
-The requested skill files were read before implementation. Milestone 0 establishes the tokens and folder boundaries they will use. The scene, SVG elements, GSAP choreography, micro-interactions, page transitions, glass overlays, Lottie and ASCII extras, reduced-motion behavior, and performance audit are scheduled for their respective milestones.
+The requested skill files were read before implementation. Milestone 1 uses the `svg-animation` skill's inline, scalable SVG approach for the pixel face, rope, d-pad, buttons, and cubes; these are static until later milestones add behavior. The GSAP choreography, micro-interactions, page transitions, glass overlays, Lottie and ASCII extras, reduced-motion behavior, and performance audit remain scheduled for their respective milestones.
