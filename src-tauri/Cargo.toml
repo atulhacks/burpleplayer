@@ -27,6 +27,7 @@ rustfft = "6.4.1"
 souvlaki = "0.8.3"
 rusqlite = { version = "0.40.2", default-features = false, features = ["bundled"] }
 walkdir = "2.5.0"
+tauri-plugin-dialog = "2.8.1"
 
 
 # Read the optimization guideline for more details: https://tauri.app/concept/size/#cargo-configuration

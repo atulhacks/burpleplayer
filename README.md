@@ -1,10 +1,10 @@
 # BurplePlayer
 
-A portrait desktop music player built with Tauri 2, Rust, React, TypeScript, Vite, pnpm, and Zustand. The attached clay-toy swing image is stored at [`design/reference.png`](design/reference.png) and guides the scene planned for milestone 1.
+A portrait desktop music player built with Tauri 2, Rust, React, TypeScript, Vite, pnpm, and Zustand. The clay-toy swing image at [`design/reference.png`](design/reference.png) is the visual reference.
 
 ## Status
 
-**Milestones 0–1 complete:** official Tauri 2 scaffold, portrait window, strict TypeScript, UI/backend folder map, reference asset, design tokens, ESLint, Prettier, Rust formatting, and an editable static clay playground. Audio playback and interactive controls are not implemented yet.
+**Milestones 0–3 complete:** the clay playground is now wired to the Rust audio engine. The console D-pad, A/B buttons, LCD, queue cubes, native music-folder picker, and compact Now Playing dock are interactive. Rust decodes and plays local music, owns the queue and persistent library, and emits playback and spectrum updates. Motion choreography, full Library/Queue/Settings views, extras, and the final audit remain for later milestones.
 
 ## Development
 
@@ -28,18 +28,25 @@ On the current macOS workstation, the Command Line Tools default to an SDK whose
 ## Architecture
 
 - `src/components/scene/` — sky, clouds, pillars, swing, player, and queue cubes.
-- `src/components/controls/` — keyboard-accessible physical toy controls.
-- `src/components/panels/` — Library, Queue, and Settings overlays.
-- `src/store/` — Zustand state for UI views and motion preference only.
-- `src/lib/` — frontend IPC adapters and event handling.
+- `src/components/controls/` — accessible Now Playing transport and seek/volume dock.
+- `src/components/panels/` — compact Queue drawer (full views arrive in milestone 5).
+- `src/store/` — Zustand UI state plus a mirror of Rust's authoritative playback/library state.
+- `src/lib/` — typed Tauri IPC, event handling, and album-art palette extraction.
 - `src-tauri/src/audio/` — Rust playback, transport, queue, and spectrum.
 - `src-tauri/src/library/` — tags, artwork, SQLite, scans, and playlists.
-- `src-tauri/src/media/` — OS media controls.
 - `src-tauri/src/ipc/` — commands and event payloads.
 
-Rust will be the source of truth for playback and library data. The current app is intentionally a static milestone-1 scene, not a mock music player.
+Rust is the source of truth for playback and library data. The frontend only sends commands and renders backend snapshots/events. The native Tauri dialog selects a folder; Rust scans it. `src-tauri/src/README.md` lists the command and event contract.
 
-The scene in `src/components/scene/ClayScene.tsx` is layered SVG/CSS, not the reference image used as a background. Its separate sky, clouds, pillars, crossbar, swing, player, and cube groups are ready for the later motion and interaction passes.
+The scene in `src/components/scene/ClayScene.tsx` is layered SVG/CSS, not the reference image used as a background. The LCD draws live track text, time, face, and a 16-band spectrum. Up to six upcoming tracks appear as cubes; album art supplies their color when available. The hot spectrum path updates SVG bars through refs without rerendering React at 30 Hz.
+
+## Controls
+
+- Console D-pad: left/right skip tracks; up/down change volume.
+- Console A: play/pause (or choose a folder when the library is empty).
+- Console B: open the Queue drawer; click an upcoming cube to jump to that song.
+- Keyboard: Space, arrow keys, Tab/Enter, and Escape for the Queue drawer.
+- The compact dock can expand to reveal seek and volume sliders. The `+ Music` button adds another folder.
 
 ## Bundled fonts
 
@@ -47,4 +54,4 @@ The interface bundles [Fredoka](https://github.com/google/fonts/tree/main/ofl/fr
 
 ## Skill application plan
 
-The requested skill files were read before implementation. Milestone 1 uses the `svg-animation` skill's inline, scalable SVG approach for the pixel face, rope, d-pad, buttons, and cubes; these are static until later milestones add behavior. The GSAP choreography, micro-interactions, page transitions, glass overlays, Lottie and ASCII extras, reduced-motion behavior, and performance audit remain scheduled for their respective milestones.
+The requested skill files were read before implementation. The `svg-animation` approach provides inline scalable vector art and live LCD spectrum bars. The `micro-interaction` approach informs console hit targets and press feedback. The `glassmorphism` approach informs the static, sparingly blurred Queue drawer and dock. GSAP choreography, cloud-wipe transitions, Lottie and ASCII extras, reduced-motion behavior, and performance audit remain scheduled for their respective milestones.

@@ -1,3 +1,11 @@
+import { useEffect, useMemo, useRef, useState } from "react";
+import type { CSSProperties } from "react";
+import { listen } from "@tauri-apps/api/event";
+import { cubeColorForTrack, fallbackCubeColor } from "../../lib/artPalette";
+import { desktopAvailable } from "../../lib/playerApi";
+import type { SpectrumEvent, Track } from "../../lib/playerApi";
+import { useAppStore } from "../../store/appStore";
+import { usePlayerStore } from "../../store/playerStore";
 import "./ClayScene.css";
 
 type CloudProps = {
@@ -16,6 +24,7 @@ type CubeProps = {
   size: number;
   color: CubeColor;
   rotate?: number;
+  face?: string;
 };
 
 function Cloud({
@@ -55,11 +64,12 @@ function Cloud({
   );
 }
 
-function Cube({ x, y, size, color, rotate = 0 }: CubeProps) {
+function Cube({ x, y, size, color, rotate = 0, face }: CubeProps) {
   return (
     <g
       className={`scene-cube scene-cube--${color}`}
       transform={`translate(${x} ${y}) rotate(${rotate}) scale(${size / 70})`}
+      style={face ? ({ "--cube-face": face } as CSSProperties) : undefined}
     >
       <ellipse
         cx="17"
@@ -322,6 +332,113 @@ function PixelEye({ x }: { x: number }) {
   );
 }
 
+function lcdText(value: string, max = 15): string {
+  const letters = Array.from(value.trim());
+  return letters.length > max
+    ? `${letters.slice(0, max - 1).join("")}…`
+    : value;
+}
+
+function lcdClock(milliseconds: number): string {
+  const seconds = Math.floor(Math.max(0, milliseconds) / 1000);
+  return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
+}
+
+function LcdDisplay() {
+  const track = usePlayerStore((state) => state.playback.track);
+  const positionMs = usePlayerStore((state) => state.playback.positionMs);
+  const playing = usePlayerStore((state) => state.playback.playing);
+  const bars = useRef<(SVGRectElement | null)[]>([]);
+
+  useEffect(() => {
+    if (!desktopAvailable) return;
+    let active = true;
+    let unlisten: (() => void) | undefined;
+    void listen<SpectrumEvent>("player:spectrum", (event) => {
+      if (!active || document.hidden) return;
+      for (let index = 0; index < 16; index += 1) {
+        const bar = bars.current[index];
+        if (!bar) continue;
+        const height = Math.max(
+          1,
+          Math.round(((event.payload.bands[index] ?? 0) / 255) * 13),
+        );
+        bar.setAttribute("y", String(696 - height));
+        bar.setAttribute("height", String(height));
+      }
+    }).then((cleanup) => {
+      if (active) unlisten = cleanup;
+      else cleanup();
+    });
+    return () => {
+      active = false;
+      unlisten?.();
+    };
+  }, []);
+
+  return (
+    <g clipPath="url(#lcd-clip)">
+      {track && (
+        <>
+          <text
+            x="591"
+            y="585"
+            textAnchor="middle"
+            className="lcd-copy lcd-copy--title"
+          >
+            {lcdText(track.title, 16)}
+          </text>
+          <text
+            x="591"
+            y="598"
+            textAnchor="middle"
+            className="lcd-copy lcd-copy--artist"
+          >
+            {lcdText(track.artist, 19)}
+          </text>
+        </>
+      )}
+      <PixelEye x={543} />
+      <PixelEye x={609} />
+      <path
+        d={
+          playing
+            ? "M559 652h11v10h41v-10h11v10h-10v12h-42v-12h-11Z"
+            : "M559 655h11v6h41v-6h11v8h-63Z"
+        }
+        fill="var(--lcd-ink)"
+        shapeRendering="crispEdges"
+        transform="translate(0 -19)"
+      />
+      {track && (
+        <text
+          x="591"
+          y="670"
+          textAnchor="middle"
+          className="lcd-copy lcd-copy--time"
+        >
+          {lcdClock(positionMs)} / {lcdClock(track.durationMs)}
+        </text>
+      )}
+      {Array.from({ length: 16 }, (_, index) => (
+        <rect
+          key={index}
+          ref={(element) => {
+            bars.current[index] = element;
+          }}
+          x={529 + index * 7.6}
+          y="695"
+          width="5"
+          height="1"
+          rx="0.5"
+          fill="var(--lcd-ink)"
+          opacity={track ? 0.88 : 0.28}
+        />
+      ))}
+    </g>
+  );
+}
+
 function Player() {
   return (
     <g className="player" aria-hidden="true">
@@ -406,13 +523,7 @@ function Player() {
         fill="var(--cloud-highlight)"
         opacity="0.12"
       />
-      <PixelEye x={543} />
-      <PixelEye x={609} />
-      <path
-        d="M559 652h11v10h41v-10h11v10h-10v12h-42v-12h-11Z"
-        fill="var(--lcd-ink)"
-        shapeRendering="crispEdges"
-      />
+      <LcdDisplay />
 
       <path
         d="M525 773h24v21h21v24h-21v21h-24v-21h-22v-24h22Z"
@@ -698,85 +809,225 @@ function SceneDefs() {
       <filter id="foreground-soft" x="-20%" y="-20%" width="140%" height="140%">
         <feGaussianBlur stdDeviation="7" />
       </filter>
+      <clipPath id="lcd-clip">
+        <rect x="525" y="568" width="131" height="132" rx="2" />
+      </clipPath>
     </defs>
   );
 }
 
 export function ClayScene() {
+  const queue = usePlayerStore((state) => state.playback.queue);
+  const queueIndex = usePlayerStore((state) => state.playback.queueIndex);
+  const toggle = usePlayerStore((state) => state.toggle);
+  const previous = usePlayerStore((state) => state.previous);
+  const next = usePlayerStore((state) => state.next);
+  const adjustVolume = usePlayerStore((state) => state.adjustVolume);
+  const jumpTo = usePlayerStore((state) => state.jumpTo);
+  const setView = useAppStore((state) => state.setView);
+  const [cubeColors, setCubeColors] = useState<Record<number, string>>({});
+  const firstUpcoming = (queueIndex ?? -1) + 1;
+  const upcoming = useMemo(
+    () => queue.slice(firstUpcoming, firstUpcoming + 6),
+    [queue, firstUpcoming],
+  );
+
+  useEffect(() => {
+    let active = true;
+    void Promise.all(
+      upcoming.map(
+        async (track) => [track.id, await cubeColorForTrack(track)] as const,
+      ),
+    ).then((colors) => {
+      if (active) setCubeColors(Object.fromEntries(colors));
+    });
+    return () => {
+      active = false;
+    };
+  }, [upcoming]);
+
+  const cubeSlots = [
+    { x: 278, y: 1193, size: 78, rotate: -4 },
+    { x: 380, y: 1122, size: 49, rotate: 1 },
+    { x: 403, y: 1253, size: 60, rotate: -2 },
+    { x: 518, y: 1275, size: 69, rotate: 2 },
+    { x: 711, y: 1275, size: 72, rotate: -1 },
+    { x: 892, y: 1249, size: 70, rotate: 2 },
+  ];
+
+  function hotspot(
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+  ): CSSProperties {
+    return {
+      left: `${(x / 1136) * 100}%`,
+      top: `${(y / 1472) * 100}%`,
+      width: `${(width / 1136) * 100}%`,
+      height: `${(height / 1472) * 100}%`,
+    };
+  }
+
   return (
-    <svg
-      className="clay-scene"
-      viewBox="0 0 1136 1472"
-      preserveAspectRatio="xMidYMid slice"
-      role="img"
-      aria-label="A smiling pink handheld music player sits on a swing between lavender and coral pillars under a blue sky, with soft clouds and colorful toy cubes on the sand."
-    >
-      <title>BurplePlayer clay playground</title>
-      <SceneDefs />
-      <rect width="1136" height="1472" fill="url(#sky-gradient)" />
-      <g data-scene-layer="clouds-back">
-        <Cloud x={-6} y={994} scale={1.25} />
-        <Cloud x={1003} y={995} scale={1.18} flip />
-      </g>
-      <path
-        d="M0 1040Q560 1026 1136 1040V1472H0Z"
-        fill="url(#ground-gradient)"
-      />
-      <path
-        d="M0 1041Q565 1026 1136 1041"
-        fill="none"
-        stroke="var(--ground-horizon)"
-        strokeWidth="5"
-        opacity="0.24"
-      />
-      <path
-        d="M297 1174q177-18 446 16l-51 29q-276 21-472-1Z"
-        fill="var(--ground-shadow)"
-        opacity="0.18"
-        filter="url(#ground-soft)"
-      />
-      <g data-scene-layer="crossbar" aria-hidden="true">
-        <path
-          d="M274 173 865 210q21 1 21 22v21q0 24-24 23L278 239Z"
-          fill="url(#bar-gradient)"
-        />
-        <path
-          d="M294 178 855 213"
-          stroke="var(--bar-highlight)"
-          strokeWidth="10"
-          opacity="0.55"
-          strokeLinecap="round"
-        />
-      </g>
-      <Pillars />
-      <g data-scene-layer="clouds-mid">
-        <Cloud x={96} y={288} scale={1.34} />
-        <Cloud x={1048} y={471} scale={1.21} flip />
-      </g>
-      <g data-scene-layer="swing">
-        <Rope x={433} top={270} />
-        <Rope x={723} top={291} />
-        <Player />
-      </g>
-      <g data-scene-layer="cubes">
-        <Cube x={111} y={1198} size={63} color="red" rotate={-3} />
-        <Cube x={278} y={1193} size={78} color="blue" rotate={-4} />
-        <Cube x={380} y={1122} size={49} color="blue" rotate={1} />
-        <Cube x={779} y={1107} size={52} color="red" rotate={-2} />
-        <Cube x={403} y={1253} size={60} color="purple" rotate={-2} />
-        <Cube x={518} y={1307} size={69} color="pink" rotate={2} />
-        <Cube x={711} y={1342} size={72} color="yellow" rotate={-1} />
-        <Cube x={892} y={1249} size={70} color="green" rotate={2} />
-      </g>
-      <g
-        data-scene-layer="clouds-front"
-        filter="url(#foreground-soft)"
+    <div className="clay-stage">
+      <svg
+        className="clay-scene"
+        viewBox="0 0 1136 1472"
+        preserveAspectRatio="none"
         aria-hidden="true"
       >
-        <Cloud x={28} y={1406} scale={1.8} foreground />
-        <Cloud x={263} y={1486} scale={1.52} foreground />
-        <Cloud x={1010} y={1492} scale={1.72} foreground flip />
-      </g>
-    </svg>
+        <title>BurplePlayer clay playground</title>
+        <SceneDefs />
+        <rect width="1136" height="1472" fill="url(#sky-gradient)" />
+        <g data-scene-layer="clouds-back">
+          <Cloud x={-6} y={994} scale={1.25} />
+          <Cloud x={1003} y={995} scale={1.18} flip />
+        </g>
+        <path
+          d="M0 1040Q560 1026 1136 1040V1472H0Z"
+          fill="url(#ground-gradient)"
+        />
+        <path
+          d="M0 1041Q565 1026 1136 1041"
+          fill="none"
+          stroke="var(--ground-horizon)"
+          strokeWidth="5"
+          opacity="0.24"
+        />
+        <path
+          d="M297 1174q177-18 446 16l-51 29q-276 21-472-1Z"
+          fill="var(--ground-shadow)"
+          opacity="0.18"
+          filter="url(#ground-soft)"
+        />
+        <g data-scene-layer="crossbar" aria-hidden="true">
+          <path
+            d="M274 173 865 210q21 1 21 22v21q0 24-24 23L278 239Z"
+            fill="url(#bar-gradient)"
+          />
+          <path
+            d="M294 178 855 213"
+            stroke="var(--bar-highlight)"
+            strokeWidth="10"
+            opacity="0.55"
+            strokeLinecap="round"
+          />
+        </g>
+        <Pillars />
+        <g data-scene-layer="clouds-mid">
+          <Cloud x={96} y={288} scale={1.34} />
+          <Cloud x={1048} y={471} scale={1.21} flip />
+        </g>
+        <g data-scene-layer="swing">
+          <Rope x={433} top={270} />
+          <Rope x={723} top={291} />
+          <Player />
+        </g>
+        <g data-scene-layer="cubes">
+          <Cube x={111} y={1198} size={63} color="red" rotate={-3} />
+          <Cube x={779} y={1107} size={52} color="red" rotate={-2} />
+          {cubeSlots.map((slot, index) => {
+            const track = upcoming[index];
+            const colors: CubeColor[] = [
+              "blue",
+              "blue",
+              "purple",
+              "pink",
+              "yellow",
+              "green",
+            ];
+            return (
+              <Cube
+                key={slot.x}
+                {...slot}
+                color={colors[index]}
+                face={
+                  track
+                    ? (cubeColors[track.id] ?? fallbackCubeColor(track))
+                    : undefined
+                }
+              />
+            );
+          })}
+        </g>
+        <g
+          data-scene-layer="clouds-front"
+          filter="url(#foreground-soft)"
+          aria-hidden="true"
+        >
+          <Cloud x={28} y={1406} scale={1.8} foreground />
+          <Cloud x={263} y={1486} scale={1.52} foreground />
+          <Cloud x={1010} y={1492} scale={1.72} foreground flip />
+        </g>
+      </svg>
+      <button
+        className="scene-hotspot scene-hotspot--dpad"
+        type="button"
+        style={hotspot(518, 769, 39, 29)}
+        aria-label="Volume up"
+        title="Volume up · ↑"
+        onClick={() => void adjustVolume(0.05)}
+      />
+      <button
+        className="scene-hotspot scene-hotspot--dpad"
+        type="button"
+        style={hotspot(497, 790, 33, 38)}
+        aria-label="Previous track"
+        title="Previous track · ←"
+        onClick={() => void previous()}
+      />
+      <button
+        className="scene-hotspot scene-hotspot--dpad"
+        type="button"
+        style={hotspot(546, 790, 31, 38)}
+        aria-label="Next track"
+        title="Next track · →"
+        onClick={() => void next()}
+      />
+      <button
+        className="scene-hotspot scene-hotspot--dpad"
+        type="button"
+        style={hotspot(518, 819, 39, 27)}
+        aria-label="Volume down"
+        title="Volume down · ↓"
+        onClick={() => void adjustVolume(-0.05)}
+      />
+      <button
+        className="scene-hotspot scene-hotspot--round"
+        type="button"
+        style={hotspot(622, 790, 33, 35)}
+        aria-label="Play or pause"
+        title="Play / pause · Space"
+        onClick={() => void toggle()}
+      />
+      <button
+        className="scene-hotspot scene-hotspot--round"
+        type="button"
+        style={hotspot(660, 778, 34, 35)}
+        aria-label="Open queue"
+        title="Open queue"
+        onClick={() => setView("queue")}
+      />
+      {upcoming.map((track: Track, index) => {
+        const slot = cubeSlots[index];
+        return (
+          <button
+            key={`${track.id}-${index}`}
+            className="scene-hotspot scene-hotspot--cube"
+            type="button"
+            style={hotspot(
+              slot.x - slot.size * 0.55,
+              slot.y - slot.size * 0.48,
+              slot.size * 1.15,
+              slot.size * 1.2,
+            )}
+            aria-label={`Play next: ${track.title} by ${track.artist}`}
+            title={`${track.title} — ${track.artist}`}
+            onClick={() => void jumpTo(firstUpcoming + index)}
+          />
+        );
+      })}
+    </div>
   );
 }

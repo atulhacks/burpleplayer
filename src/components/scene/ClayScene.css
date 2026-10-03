@@ -1,9 +1,69 @@
+.clay-stage {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: max(100%, calc(100vh * 0.77174));
+  height: max(100%, calc(100vw * 1.29578));
+  transform: translate(-50%, -50%);
+}
+
 .clay-scene {
   display: block;
   width: 100%;
   height: 100%;
   overflow: hidden;
   background: var(--sky-top);
+}
+
+.lcd-copy {
+  fill: var(--lcd-ink);
+  font-family: "Press Start 2P", monospace;
+  font-weight: 400;
+  paint-order: stroke fill;
+  pointer-events: none;
+}
+
+.lcd-copy--title {
+  font-size: 7px;
+}
+.lcd-copy--artist {
+  font-size: 5.5px;
+}
+.lcd-copy--time {
+  font-size: 6.5px;
+}
+
+.scene-hotspot {
+  position: absolute;
+  z-index: 2;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  -webkit-app-region: no-drag;
+}
+
+.scene-hotspot--round,
+.scene-hotspot--cube {
+  border-radius: 12px;
+}
+
+.scene-hotspot--round {
+  border-radius: 50%;
+}
+
+.scene-hotspot:hover {
+  background: rgb(255 255 255 / 16%);
+}
+
+.scene-hotspot:active {
+  transform: scale(0.88);
+}
+
+.scene-hotspot:focus-visible {
+  outline: 5px solid var(--focus-ring);
+  outline-offset: 3px;
+  background: rgb(255 255 255 / 22%);
 }
 
 .stop-sky-top {
