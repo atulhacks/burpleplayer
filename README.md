@@ -4,7 +4,7 @@ A portrait desktop music player built with Tauri 2, Rust, React, TypeScript, Vit
 
 ## Status
 
-**Milestones 0–3 complete:** the clay playground is now wired to the Rust audio engine. The console D-pad, A/B buttons, LCD, queue cubes, native music-folder picker, and compact Now Playing dock are interactive. Rust decodes and plays local music, owns the queue and persistent library, and emits playback and spectrum updates. Motion choreography, full Library/Queue/Settings views, extras, and the final audit remain for later milestones.
+**Milestones 0–4 complete:** the clay playground is wired to the Rust audio engine and has its motion pass. The console D-pad, A/B buttons, LCD, queue cubes, native music-folder picker, and compact Now Playing dock are interactive. Rust decodes and plays local music, owns the queue and persistent library, and emits playback and spectrum updates. Full Library/Queue/Settings views, extras, and the final audit remain for later milestones.
 
 ## Development
 
@@ -40,6 +40,8 @@ Rust is the source of truth for playback and library data. The frontend only sen
 
 The scene in `src/components/scene/ClayScene.tsx` is layered SVG/CSS, not the reference image used as a background. The LCD draws live track text, time, face, and a 16-band spectrum. Up to six upcoming tracks appear as cubes; album art supplies their color when available. The hot spectrum path updates SVG bars through refs without rerendering React at 30 Hz.
 
+`src/components/scene/useSceneMotion.ts` owns one GSAP ticker callback for the scene: a damped swing spring driven by volume and spectrum energy, staggered bass/kick cube hops, three cloud parallax layers, and a softly bobbing/blinking LCD face. The same spectrum listener feeds motion and LCD bars. Animation suspends when the document is hidden; OS reduced-motion and the app's `system`/`reduced`/`full` preference disable scene motion without stopping LCD updates. Button, D-pad, and slider feedback uses transform-only CSS transitions with a reduced-motion override.
+
 ## Controls
 
 - Console D-pad: left/right skip tracks; up/down change volume.
@@ -54,4 +56,4 @@ The interface bundles [Fredoka](https://github.com/google/fonts/tree/main/ofl/fr
 
 ## Skill application plan
 
-The requested skill files were read before implementation. The `svg-animation` approach provides inline scalable vector art and live LCD spectrum bars. The `micro-interaction` approach informs console hit targets and press feedback. The `glassmorphism` approach informs the static, sparingly blurred Queue drawer and dock. GSAP choreography, cloud-wipe transitions, Lottie and ASCII extras, reduced-motion behavior, and performance audit remain scheduled for their respective milestones.
+The requested skill files were read before implementation. The `svg-animation` approach provides inline scalable vector art and live LCD spectrum bars. The `micro-interaction` approach informs console hit targets, press feedback, and slider spring release. The `gsap-web` approach supplies the single-ticker scene choreography. The `accessible-animation` approach supplies OS/in-app reduced-motion behavior. The `glassmorphism` approach informs the static, sparingly blurred Queue drawer and dock. Cloud-wipe transitions, Lottie and ASCII extras, and the measured performance audit remain scheduled for their respective milestones.

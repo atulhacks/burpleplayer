@@ -1,11 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties } from "react";
-import { listen } from "@tauri-apps/api/event";
 import { cubeColorForTrack, fallbackCubeColor } from "../../lib/artPalette";
-import { desktopAvailable } from "../../lib/playerApi";
-import type { SpectrumEvent, Track } from "../../lib/playerApi";
+import type { Track } from "../../lib/playerApi";
 import { useAppStore } from "../../store/appStore";
 import { usePlayerStore } from "../../store/playerStore";
+import { useSceneMotion } from "./useSceneMotion";
 import "./ClayScene.css";
 
 type CloudProps = {
@@ -322,10 +321,14 @@ function Rope({ x, top }: { x: number; top: number }) {
   );
 }
 
-function PixelEye({ x }: { x: number }) {
+function PixelEye({ x, sleepy = false }: { x: number; sleepy?: boolean }) {
   return (
     <path
-      d={`M${x + 5} 610h12v4h4v18h-4v4h-12v-4h-4v-18h4Z`}
+      d={
+        sleepy
+          ? `M${x + 1} 622h22v5h-22Z`
+          : `M${x + 5} 610h12v4h4v18h-4v4h-12v-4h-4v-18h4Z`
+      }
       fill="var(--lcd-ink)"
       shapeRendering="crispEdges"
     />
@@ -344,37 +347,25 @@ function lcdClock(milliseconds: number): string {
   return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
 }
 
-function LcdDisplay() {
+function LcdDisplay({
+  bars,
+}: {
+  bars: React.RefObject<(SVGRectElement | null)[]>;
+}) {
   const track = usePlayerStore((state) => state.playback.track);
   const positionMs = usePlayerStore((state) => state.playback.positionMs);
   const playing = usePlayerStore((state) => state.playback.playing);
-  const bars = useRef<(SVGRectElement | null)[]>([]);
-
-  useEffect(() => {
-    if (!desktopAvailable) return;
-    let active = true;
-    let unlisten: (() => void) | undefined;
-    void listen<SpectrumEvent>("player:spectrum", (event) => {
-      if (!active || document.hidden) return;
-      for (let index = 0; index < 16; index += 1) {
-        const bar = bars.current[index];
-        if (!bar) continue;
-        const height = Math.max(
-          1,
-          Math.round(((event.payload.bands[index] ?? 0) / 255) * 13),
-        );
-        bar.setAttribute("y", String(696 - height));
-        bar.setAttribute("height", String(height));
-      }
-    }).then((cleanup) => {
-      if (active) unlisten = cleanup;
-      else cleanup();
-    });
-    return () => {
-      active = false;
-      unlisten?.();
-    };
-  }, []);
+  const status = usePlayerStore((state) => state.status);
+  const error = usePlayerStore((state) => state.error);
+  const face = error
+    ? "error"
+    : status === "loading" || status === "scanning"
+      ? "loading"
+      : !track
+        ? "idle"
+        : playing
+          ? "playing"
+          : "paused";
 
   return (
     <g clipPath="url(#lcd-clip)">
@@ -398,18 +389,58 @@ function LcdDisplay() {
           </text>
         </>
       )}
-      <PixelEye x={543} />
-      <PixelEye x={609} />
-      <path
-        d={
-          playing
-            ? "M559 652h11v10h41v-10h11v10h-10v12h-42v-12h-11Z"
-            : "M559 655h11v6h41v-6h11v8h-63Z"
-        }
-        fill="var(--lcd-ink)"
-        shapeRendering="crispEdges"
-        transform="translate(0 -19)"
-      />
+      <g data-motion-face>
+        <g data-motion-eyes>
+          {face === "error" ? (
+            <>
+              <path
+                d="M546 613l19 18m0-18-19 18M612 613l19 18m0-18-19 18"
+                stroke="var(--lcd-ink)"
+                strokeWidth="5"
+              />
+            </>
+          ) : face === "loading" ? (
+            <>
+              <rect
+                x="548"
+                y="618"
+                width="14"
+                height="14"
+                fill="var(--lcd-ink)"
+              />
+              <rect
+                x="613"
+                y="618"
+                width="14"
+                height="14"
+                fill="var(--lcd-ink)"
+                opacity="0.55"
+              />
+            </>
+          ) : (
+            <>
+              <PixelEye x={543} sleepy={face === "paused"} />
+              <PixelEye x={609} sleepy={face === "paused"} />
+            </>
+          )}
+        </g>
+        <path
+          d={
+            face === "error"
+              ? "M558 654h14v-5h14v5h15v-5h14v5h8v6h-65Z"
+              : face === "loading"
+                ? "M565 650h52v6h-52Z"
+                : face === "paused"
+                  ? "M565 653h52v5h-52Z"
+                  : face === "playing"
+                    ? "M559 652h11v10h41v-10h11v10h-10v12h-42v-12h-11Z"
+                    : "M559 655h11v6h41v-6h11v8h-63Z"
+          }
+          fill="var(--lcd-ink)"
+          shapeRendering="crispEdges"
+          transform="translate(0 -19)"
+        />
+      </g>
       {track && (
         <text
           x="591"
@@ -439,7 +470,11 @@ function LcdDisplay() {
   );
 }
 
-function Player() {
+function Player({
+  bars,
+}: {
+  bars: React.RefObject<(SVGRectElement | null)[]>;
+}) {
   return (
     <g className="player" aria-hidden="true">
       <path
@@ -523,7 +558,7 @@ function Player() {
         fill="var(--cloud-highlight)"
         opacity="0.12"
       />
-      <LcdDisplay />
+      <LcdDisplay bars={bars} />
 
       <path
         d="M525 773h24v21h21v24h-21v21h-24v-21h-22v-24h22Z"
@@ -817,6 +852,9 @@ function SceneDefs() {
 }
 
 export function ClayScene() {
+  const stageRef = useRef<HTMLDivElement>(null);
+  const bars = useRef<(SVGRectElement | null)[]>([]);
+  useSceneMotion(stageRef, bars);
   const queue = usePlayerStore((state) => state.playback.queue);
   const queueIndex = usePlayerStore((state) => state.playback.queueIndex);
   const toggle = usePlayerStore((state) => state.toggle);
@@ -870,7 +908,7 @@ export function ClayScene() {
   }
 
   return (
-    <div className="clay-stage">
+    <div className="clay-stage" ref={stageRef}>
       <svg
         className="clay-scene"
         viewBox="0 0 1136 1472"
@@ -922,7 +960,7 @@ export function ClayScene() {
         <g data-scene-layer="swing">
           <Rope x={433} top={270} />
           <Rope x={723} top={291} />
-          <Player />
+          <Player bars={bars} />
         </g>
         <g data-scene-layer="cubes">
           <Cube x={111} y={1198} size={63} color="red" rotate={-3} />
@@ -938,16 +976,17 @@ export function ClayScene() {
               "green",
             ];
             return (
-              <Cube
-                key={slot.x}
-                {...slot}
-                color={colors[index]}
-                face={
-                  track
-                    ? (cubeColors[track.id] ?? fallbackCubeColor(track))
-                    : undefined
-                }
-              />
+              <g key={slot.x} data-motion-cube={index}>
+                <Cube
+                  {...slot}
+                  color={colors[index]}
+                  face={
+                    track
+                      ? (cubeColors[track.id] ?? fallbackCubeColor(track))
+                      : undefined
+                  }
+                />
+              </g>
             );
           })}
         </g>
@@ -963,6 +1002,7 @@ export function ClayScene() {
       </svg>
       <button
         className="scene-hotspot scene-hotspot--dpad"
+        data-direction="up"
         type="button"
         style={hotspot(518, 769, 39, 29)}
         aria-label="Volume up"
@@ -971,6 +1011,7 @@ export function ClayScene() {
       />
       <button
         className="scene-hotspot scene-hotspot--dpad"
+        data-direction="left"
         type="button"
         style={hotspot(497, 790, 33, 38)}
         aria-label="Previous track"
@@ -979,6 +1020,7 @@ export function ClayScene() {
       />
       <button
         className="scene-hotspot scene-hotspot--dpad"
+        data-direction="right"
         type="button"
         style={hotspot(546, 790, 31, 38)}
         aria-label="Next track"
@@ -987,6 +1029,7 @@ export function ClayScene() {
       />
       <button
         className="scene-hotspot scene-hotspot--dpad"
+        data-direction="down"
         type="button"
         style={hotspot(518, 819, 39, 27)}
         aria-label="Volume down"

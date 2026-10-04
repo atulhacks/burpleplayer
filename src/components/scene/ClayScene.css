@@ -57,7 +57,23 @@
 }
 
 .scene-hotspot:active {
-  transform: scale(0.88);
+  scale: 0.87;
+}
+
+.scene-hotspot--dpad[data-direction="left"]:active {
+  rotate: -7deg;
+}
+
+.scene-hotspot--dpad[data-direction="right"]:active {
+  rotate: 7deg;
+}
+
+.scene-hotspot--dpad[data-direction="up"]:active {
+  rotate: -3deg;
+}
+
+.scene-hotspot--dpad[data-direction="down"]:active {
+  rotate: 3deg;
 }
 
 .scene-hotspot:focus-visible {

@@ -11,6 +11,7 @@ import "./App.css";
 export default function App() {
   usePlayerBridge();
   const view = useAppStore((state) => state.view);
+  const motionPreference = useAppStore((state) => state.motionPreference);
   const setView = useAppStore((state) => state.setView);
   const status = usePlayerStore((state) => state.status);
   const error = usePlayerStore((state) => state.error);
@@ -66,7 +67,7 @@ export default function App() {
   }, [setView]);
 
   return (
-    <main className="app-shell">
+    <main className="app-shell" data-motion-preference={motionPreference}>
       <div className="scene-frame">
         <ClayScene />
       </div>
