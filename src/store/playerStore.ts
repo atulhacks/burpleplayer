@@ -1,6 +1,11 @@
 import { create } from "zustand";
 import { desktopAvailable, playerApi } from "../lib/playerApi";
-import type { PlaybackState, PositionEvent, Track } from "../lib/playerApi";
+import type {
+  PlaybackState,
+  Playlist,
+  PositionEvent,
+  Track,
+} from "../lib/playerApi";
 
 export type PlayerStatus = "loading" | "ready" | "scanning" | "web-preview";
 
@@ -8,12 +13,14 @@ interface PlayerStore {
   playback: PlaybackState;
   tracks: Track[];
   folders: string[];
+  playlists: Playlist[];
   status: PlayerStatus;
   error: string | null;
   applyPlayback: (playback: PlaybackState) => void;
   applyPosition: (position: PositionEvent) => void;
   setTracks: (tracks: Track[]) => void;
   setFolders: (folders: string[]) => void;
+  setPlaylists: (playlists: Playlist[]) => void;
   setStatus: (status: PlayerStatus) => void;
   setError: (error: string | null) => void;
   toggle: () => Promise<void>;
@@ -23,7 +30,17 @@ interface PlayerStore {
   setVolume: (volume: number) => Promise<void>;
   adjustVolume: (delta: number) => Promise<void>;
   jumpTo: (index: number) => Promise<void>;
+  playTracks: (trackIds: number[], startIndex: number) => Promise<void>;
+  enqueueTracks: (trackIds: number[]) => Promise<void>;
+  moveQueue: (from: number, to: number) => Promise<void>;
+  removeQueue: (index: number) => Promise<void>;
   importFolder: () => Promise<void>;
+  rescanFolder: (path: string) => Promise<void>;
+  removeFolder: (path: string) => Promise<void>;
+  createPlaylist: (name: string) => Promise<void>;
+  deletePlaylist: (id: number) => Promise<void>;
+  addToPlaylist: (playlistId: number, trackId: number) => Promise<void>;
+  removeFromPlaylist: (playlistId: number, trackId: number) => Promise<void>;
 }
 
 const initialPlayback: PlaybackState = {
@@ -57,6 +74,7 @@ export const usePlayerStore = create<PlayerStore>((set, get) => {
     playback: initialPlayback,
     tracks: [],
     folders: [],
+    playlists: [],
     status: desktopAvailable ? "loading" : "web-preview",
     error: null,
     applyPlayback: (playback) => set({ playback, error: null }),
@@ -70,6 +88,7 @@ export const usePlayerStore = create<PlayerStore>((set, get) => {
       })),
     setTracks: (tracks) => set({ tracks }),
     setFolders: (folders) => set({ folders }),
+    setPlaylists: (playlists) => set({ playlists }),
     setStatus: (status) => set({ status }),
     setError: (error) => set({ error }),
     toggle: async () => {
@@ -98,6 +117,11 @@ export const usePlayerStore = create<PlayerStore>((set, get) => {
       await get().setVolume(Math.round((volume + delta) * 100) / 100);
     },
     jumpTo: (index) => transport(() => playerApi.jumpToQueueIndex(index)),
+    playTracks: (trackIds, startIndex) =>
+      transport(() => playerApi.loadQueue(trackIds, startIndex)),
+    enqueueTracks: (trackIds) => transport(() => playerApi.enqueue(trackIds)),
+    moveQueue: (from, to) => transport(() => playerApi.moveInQueue(from, to)),
+    removeQueue: (index) => transport(() => playerApi.removeFromQueue(index)),
     importFolder: async () => {
       if (!desktopAvailable) {
         set({ error: "Open the Tauri desktop app to choose a music folder." });
@@ -115,6 +139,65 @@ export const usePlayerStore = create<PlayerStore>((set, get) => {
         }
       } catch (error) {
         set({ error: errorMessage(error), status: "ready" });
+      }
+    },
+    rescanFolder: async (path) => {
+      if (!desktopAvailable) return;
+      try {
+        set({ status: "scanning", error: null });
+        const tracks = await playerApi.scanFolder(path);
+        set({ tracks, status: "ready" });
+      } catch (error) {
+        set({ status: "ready", error: errorMessage(error) });
+      }
+    },
+    removeFolder: async (path) => {
+      if (!desktopAvailable) return;
+      try {
+        const tracks = await playerApi.removeFolder(path);
+        const [folders, playlists] = await Promise.all([
+          playerApi.getFolders(),
+          playerApi.getPlaylists(),
+        ]);
+        set({ tracks, folders, playlists, error: null });
+      } catch (error) {
+        set({ error: errorMessage(error) });
+      }
+    },
+    createPlaylist: async (name) => {
+      if (!desktopAvailable) return;
+      try {
+        await playerApi.createPlaylist(name.trim());
+        set({ playlists: await playerApi.getPlaylists(), error: null });
+      } catch (error) {
+        set({ error: errorMessage(error) });
+      }
+    },
+    deletePlaylist: async (id) => {
+      if (!desktopAvailable) return;
+      try {
+        await playerApi.deletePlaylist(id);
+        set({ playlists: await playerApi.getPlaylists(), error: null });
+      } catch (error) {
+        set({ error: errorMessage(error) });
+      }
+    },
+    addToPlaylist: async (playlistId, trackId) => {
+      if (!desktopAvailable) return;
+      try {
+        await playerApi.addToPlaylist(playlistId, trackId);
+        set({ playlists: await playerApi.getPlaylists(), error: null });
+      } catch (error) {
+        set({ error: errorMessage(error) });
+      }
+    },
+    removeFromPlaylist: async (playlistId, trackId) => {
+      if (!desktopAvailable) return;
+      try {
+        await playerApi.removeFromPlaylist(playlistId, trackId);
+        set({ playlists: await playerApi.getPlaylists(), error: null });
+      } catch (error) {
+        set({ error: errorMessage(error) });
       }
     },
   };

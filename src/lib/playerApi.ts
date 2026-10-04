@@ -35,6 +35,12 @@ export interface AlbumArt {
   bytes: number[];
 }
 
+export interface Playlist {
+  id: number;
+  name: string;
+  tracks: Track[];
+}
+
 export const desktopAvailable = isTauri();
 
 export const playerApi = {
@@ -53,9 +59,23 @@ export const playerApi = {
   prev: () => invoke<PlaybackState>("prev"),
   loadQueue: (trackIds: number[], startIndex: number) =>
     invoke<PlaybackState>("load_queue", { trackIds, startIndex }),
+  enqueue: (trackIds: number[]) =>
+    invoke<PlaybackState>("enqueue", { trackIds }),
+  removeFromQueue: (index: number) =>
+    invoke<PlaybackState>("remove_from_queue", { index }),
+  moveInQueue: (from: number, to: number) =>
+    invoke<PlaybackState>("move_in_queue", { from, to }),
   jumpToQueueIndex: (index: number) =>
     invoke<PlaybackState>("jump_to_queue_index", { index }),
   scanFolder: (path: string) => invoke<Track[]>("scan_folder", { path }),
+  removeFolder: (path: string) => invoke<Track[]>("remove_folder", { path }),
+  getPlaylists: () => invoke<Playlist[]>("get_playlists"),
+  createPlaylist: (name: string) => invoke<number>("create_playlist", { name }),
+  deletePlaylist: (id: number) => invoke<void>("delete_playlist", { id }),
+  addToPlaylist: (playlistId: number, trackId: number) =>
+    invoke<void>("add_to_playlist", { playlistId, trackId }),
+  removeFromPlaylist: (playlistId: number, trackId: number) =>
+    invoke<void>("remove_from_playlist", { playlistId, trackId }),
   async pickFolder(): Promise<string | null> {
     const selected = await open({
       directory: true,

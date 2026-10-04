@@ -22,7 +22,16 @@ export function usePlayerBridge() {
             if (active) usePlayerStore.getState().applyPosition(event.payload);
           }),
           listen<Track[]>("library:updated", (event) => {
-            if (active) usePlayerStore.getState().setTracks(event.payload);
+            if (!active) return;
+            usePlayerStore.getState().setTracks(event.payload);
+            void playerApi.getPlaylists().then(
+              (playlists) => {
+                if (active) usePlayerStore.getState().setPlaylists(playlists);
+              },
+              (error) => {
+                if (active) usePlayerStore.getState().setError(String(error));
+              },
+            );
           }),
         ]);
         if (!active) {
@@ -30,16 +39,18 @@ export function usePlayerBridge() {
           return;
         }
         unlisteners = listeners;
-        const [playback, tracks, folders] = await Promise.all([
+        const [playback, tracks, folders, playlists] = await Promise.all([
           playerApi.playbackState(),
           playerApi.getTracks(),
           playerApi.getFolders(),
+          playerApi.getPlaylists(),
         ]);
         if (!active) return;
         const current = usePlayerStore.getState();
         current.applyPlayback(playback);
         current.setTracks(tracks);
         current.setFolders(folders);
+        current.setPlaylists(playlists);
         current.setStatus("ready");
       } catch (error) {
         if (active) {

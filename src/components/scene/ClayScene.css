@@ -32,6 +32,10 @@
 .lcd-copy--time {
   font-size: 6.5px;
 }
+.lcd-copy--ascii {
+  font-size: 7px;
+  letter-spacing: -0.9px;
+}
 
 .scene-hotspot {
   position: absolute;

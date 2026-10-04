@@ -97,144 +97,152 @@ function Cube({ x, y, size, color, rotate = 0, face }: CubeProps) {
 function Pillars() {
   return (
     <g className="pillars" aria-hidden="true">
-      <ellipse
-        cx="190"
-        cy="1205"
-        rx="169"
-        ry="36"
-        fill="var(--ground-shadow)"
-        opacity="0.31"
-        filter="url(#ground-soft)"
-      />
-      <ellipse
-        cx="924"
-        cy="1177"
-        rx="157"
-        ry="35"
-        fill="var(--ground-shadow)"
-        opacity="0.31"
-        filter="url(#ground-soft)"
-      />
-      <path d="M35 1190h309v43H51q-16 0-16-16Z" fill="url(#base-gradient)" />
-      <path d="M783 1146h291v54H811q-28 0-28-19Z" fill="url(#base-gradient)" />
+      <g data-pillar="left">
+        <ellipse
+          cx="190"
+          cy="1205"
+          rx="169"
+          ry="36"
+          fill="var(--ground-shadow)"
+          opacity="0.31"
+          filter="url(#ground-soft)"
+        />
+        <path d="M35 1190h309v43H51q-16 0-16-16Z" fill="url(#base-gradient)" />
 
-      <rect
-        x="81"
-        y="708"
-        width="218"
-        height="494"
-        rx="24"
-        fill="url(#lavender-gradient)"
-      />
-      <path
-        d="M94 721c18-8 30-9 45-7v477H98q-17 0-17-18V746q0-18 13-25Z"
-        fill="var(--pillar-left-highlight)"
-        opacity="0.34"
-      />
-      <path
-        d="M270 724q26 0 29 25v420q-3 26-29 30Z"
-        fill="var(--pillar-left-shadow)"
-        opacity="0.22"
-      />
-      <rect
-        x="81"
-        y="603"
-        width="218"
-        height="108"
-        rx="22"
-        fill="url(#green-gradient)"
-      />
-      <path
-        d="M88 622q16-21 48-17h147q-25 9-30 26l-1 77H99q-19-3-18-24v-53Z"
-        fill="var(--cloud-highlight)"
-        opacity="0.21"
-      />
-      <rect
-        x="80"
-        y="61"
-        width="218"
-        height="541"
-        rx="34"
-        fill="url(#lavender-gradient)"
-      />
-      <path
-        d="M86 104q10-34 54-39h114q-28 8-36 43v491H104q-24 0-24-25V130q0-17 6-26Z"
-        fill="var(--pillar-left-highlight)"
-        opacity="0.25"
-      />
-      <path
-        d="M270 74q28 7 28 37v448q-4 31-28 42Z"
-        fill="var(--pillar-left-shadow)"
-        opacity="0.27"
-      />
-      <ellipse
-        cx="137"
-        cy="77"
-        rx="9"
-        ry="14"
-        fill="var(--cloud-highlight)"
-        opacity="0.8"
-        filter="url(#sparkle-soft)"
-      />
+        <rect
+          x="81"
+          y="708"
+          width="218"
+          height="494"
+          rx="24"
+          fill="url(#lavender-gradient)"
+        />
+        <path
+          d="M94 721c18-8 30-9 45-7v477H98q-17 0-17-18V746q0-18 13-25Z"
+          fill="var(--pillar-left-highlight)"
+          opacity="0.34"
+        />
+        <path
+          d="M270 724q26 0 29 25v420q-3 26-29 30Z"
+          fill="var(--pillar-left-shadow)"
+          opacity="0.22"
+        />
+        <rect
+          x="81"
+          y="603"
+          width="218"
+          height="108"
+          rx="22"
+          fill="url(#green-gradient)"
+        />
+        <path
+          d="M88 622q16-21 48-17h147q-25 9-30 26l-1 77H99q-19-3-18-24v-53Z"
+          fill="var(--cloud-highlight)"
+          opacity="0.21"
+        />
+        <rect
+          x="80"
+          y="61"
+          width="218"
+          height="541"
+          rx="34"
+          fill="url(#lavender-gradient)"
+        />
+        <path
+          d="M86 104q10-34 54-39h114q-28 8-36 43v491H104q-24 0-24-25V130q0-17 6-26Z"
+          fill="var(--pillar-left-highlight)"
+          opacity="0.25"
+        />
+        <path
+          d="M270 74q28 7 28 37v448q-4 31-28 42Z"
+          fill="var(--pillar-left-shadow)"
+          opacity="0.27"
+        />
+        <ellipse
+          cx="137"
+          cy="77"
+          rx="9"
+          ry="14"
+          fill="var(--cloud-highlight)"
+          opacity="0.8"
+          filter="url(#sparkle-soft)"
+        />
+      </g>
 
-      <rect
-        x="829"
-        y="709"
-        width="215"
-        height="454"
-        rx="24"
-        fill="url(#coral-gradient)"
-      />
-      <path
-        d="M842 725q19-12 42-11v442h-31q-24-3-24-25V752q0-18 13-27Z"
-        fill="var(--pillar-right-highlight)"
-        opacity="0.34"
-      />
-      <path
-        d="M1014 719q30 7 30 32v381q-2 24-30 29Z"
-        fill="var(--pillar-right-shadow)"
-        opacity="0.18"
-      />
-      <rect
-        x="829"
-        y="608"
-        width="215"
-        height="105"
-        rx="22"
-        fill="url(#green-gradient)"
-      />
-      <path
-        d="M838 625q19-15 50-14h148q-24 10-29 34v65H853q-24-2-24-25v-39q0-15 9-21Z"
-        fill="var(--cloud-highlight)"
-        opacity="0.19"
-      />
-      <rect
-        x="829"
-        y="124"
-        width="215"
-        height="485"
-        rx="35"
-        fill="url(#coral-gradient)"
-      />
-      <path
-        d="M837 170q13-32 53-43h104q-28 11-35 42v434H851q-22 0-22-25V194q0-15 8-24Z"
-        fill="var(--pillar-right-highlight)"
-        opacity="0.25"
-      />
-      <path
-        d="M1015 135q29 8 29 37v397q-3 26-29 37Z"
-        fill="var(--pillar-right-shadow)"
-        opacity="0.23"
-      />
-      <ellipse
-        cx="907"
-        cy="138"
-        rx="7"
-        ry="11"
-        fill="var(--cloud-highlight)"
-        opacity="0.65"
-        filter="url(#sparkle-soft)"
-      />
+      <g data-pillar="right">
+        <ellipse
+          cx="924"
+          cy="1177"
+          rx="157"
+          ry="35"
+          fill="var(--ground-shadow)"
+          opacity="0.31"
+          filter="url(#ground-soft)"
+        />
+        <path
+          d="M783 1146h291v54H811q-28 0-28-19Z"
+          fill="url(#base-gradient)"
+        />
+
+        <rect
+          x="829"
+          y="709"
+          width="215"
+          height="454"
+          rx="24"
+          fill="url(#coral-gradient)"
+        />
+        <path
+          d="M842 725q19-12 42-11v442h-31q-24-3-24-25V752q0-18 13-27Z"
+          fill="var(--pillar-right-highlight)"
+          opacity="0.34"
+        />
+        <path
+          d="M1014 719q30 7 30 32v381q-2 24-30 29Z"
+          fill="var(--pillar-right-shadow)"
+          opacity="0.18"
+        />
+        <rect
+          x="829"
+          y="608"
+          width="215"
+          height="105"
+          rx="22"
+          fill="url(#green-gradient)"
+        />
+        <path
+          d="M838 625q19-15 50-14h148q-24 10-29 34v65H853q-24-2-24-25v-39q0-15 9-21Z"
+          fill="var(--cloud-highlight)"
+          opacity="0.19"
+        />
+        <rect
+          x="829"
+          y="124"
+          width="215"
+          height="485"
+          rx="35"
+          fill="url(#coral-gradient)"
+        />
+        <path
+          d="M837 170q13-32 53-43h104q-28 11-35 42v434H851q-22 0-22-25V194q0-15 8-24Z"
+          fill="var(--pillar-right-highlight)"
+          opacity="0.25"
+        />
+        <path
+          d="M1015 135q29 8 29 37v397q-3 26-29 37Z"
+          fill="var(--pillar-right-shadow)"
+          opacity="0.23"
+        />
+        <ellipse
+          cx="907"
+          cy="138"
+          rx="7"
+          ry="11"
+          fill="var(--cloud-highlight)"
+          opacity="0.65"
+          filter="url(#sparkle-soft)"
+        />
+      </g>
 
       <g transform="translate(58 718) rotate(-14)">
         <rect
@@ -349,14 +357,17 @@ function lcdClock(milliseconds: number): string {
 
 function LcdDisplay({
   bars,
+  ascii,
 }: {
   bars: React.RefObject<(SVGRectElement | null)[]>;
+  ascii: React.RefObject<SVGTextElement | null>;
 }) {
   const track = usePlayerStore((state) => state.playback.track);
   const positionMs = usePlayerStore((state) => state.playback.positionMs);
   const playing = usePlayerStore((state) => state.playback.playing);
   const status = usePlayerStore((state) => state.status);
   const error = usePlayerStore((state) => state.error);
+  const visualizerMode = useAppStore((state) => state.visualizerMode);
   const face = error
     ? "error"
     : status === "loading" || status === "scanning"
@@ -463,17 +474,28 @@ function LcdDisplay({
           height="1"
           rx="0.5"
           fill="var(--lcd-ink)"
-          opacity={track ? 0.88 : 0.28}
+          opacity={visualizerMode === "bars" ? (track ? 0.88 : 0.28) : 0}
         />
       ))}
+      <text
+        ref={ascii}
+        x="529"
+        y="694"
+        className="lcd-copy lcd-copy--ascii"
+        opacity={visualizerMode === "ascii" ? 0.85 : 0}
+      >
+        ................
+      </text>
     </g>
   );
 }
 
 function Player({
   bars,
+  ascii,
 }: {
   bars: React.RefObject<(SVGRectElement | null)[]>;
+  ascii: React.RefObject<SVGTextElement | null>;
 }) {
   return (
     <g className="player" aria-hidden="true">
@@ -558,7 +580,7 @@ function Player({
         fill="var(--cloud-highlight)"
         opacity="0.12"
       />
-      <LcdDisplay bars={bars} />
+      <LcdDisplay bars={bars} ascii={ascii} />
 
       <path
         d="M525 773h24v21h21v24h-21v21h-24v-21h-22v-24h22Z"
@@ -854,7 +876,8 @@ function SceneDefs() {
 export function ClayScene() {
   const stageRef = useRef<HTMLDivElement>(null);
   const bars = useRef<(SVGRectElement | null)[]>([]);
-  useSceneMotion(stageRef, bars);
+  const ascii = useRef<SVGTextElement>(null);
+  useSceneMotion(stageRef, bars, ascii);
   const queue = usePlayerStore((state) => state.playback.queue);
   const queueIndex = usePlayerStore((state) => state.playback.queueIndex);
   const toggle = usePlayerStore((state) => state.toggle);
@@ -960,7 +983,7 @@ export function ClayScene() {
         <g data-scene-layer="swing">
           <Rope x={433} top={270} />
           <Rope x={723} top={291} />
-          <Player bars={bars} />
+          <Player bars={bars} ascii={ascii} />
         </g>
         <g data-scene-layer="cubes">
           <Cube x={111} y={1198} size={63} color="red" rotate={-3} />

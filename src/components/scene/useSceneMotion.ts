@@ -11,6 +11,7 @@ type Setter = (value: number) => void;
 export function useSceneMotion(
   stageRef: RefObject<HTMLDivElement | null>,
   bars: RefObject<(SVGRectElement | null)[]>,
+  ascii: RefObject<SVGTextElement | null>,
 ) {
   useEffect(() => {
     const stage = stageRef.current;
@@ -159,6 +160,12 @@ export function useSceneMotion(
       void listen<SpectrumEvent>("player:spectrum", (event) => {
         if (!active || document.hidden) return;
         bands = event.payload.bands;
+        if (ascii.current) {
+          const glyphs = " .:-=+*#%@";
+          ascii.current.textContent = bands
+            .map((band) => glyphs[Math.min(9, Math.floor((band / 255) * 10))])
+            .join("");
+        }
         for (let index = 0; index < 16; index += 1) {
           const bar = bars.current[index];
           if (!bar) continue;
@@ -187,5 +194,5 @@ export function useSceneMotion(
         clearProps: "transform",
       });
     };
-  }, [stageRef, bars]);
+  }, [stageRef, bars, ascii]);
 }

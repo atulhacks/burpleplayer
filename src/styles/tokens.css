@@ -72,6 +72,10 @@
   --base-dark: #c87d5a;
   --ink: #352446;
   --focus-ring: #352446;
+  --glass-fill: rgb(255 248 241 / 90%);
+  --glass-edge: rgb(255 255 255 / 88%);
+  --glass-text-soft: #604764;
+  --glass-accent: #5b3a7a;
 
   --radius-toy: 24px;
   --radius-panel: 28px;
