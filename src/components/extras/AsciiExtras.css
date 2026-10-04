@@ -1,0 +1,56 @@
+.ascii-empty,
+.ascii-scan pre {
+  margin: 0;
+  color: var(--plum);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.13;
+  white-space: pre;
+}
+
+.ascii-empty {
+  max-width: 100%;
+  overflow: hidden;
+  color: #77538a;
+  text-align: left;
+}
+
+.ascii-scan {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-height: 90px;
+  margin: 0 0 10px;
+  padding: 10px 13px;
+  border: 1px solid rgb(91 58 122 / 13%);
+  border-radius: 14px;
+  background: rgb(255 255 255 / 52%);
+  color: var(--plum);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.ascii-scan pre {
+  flex: 0 0 auto;
+  font-size: 9px;
+}
+
+.ascii-scan .lottie-art {
+  flex: 0 0 58px;
+  width: 58px;
+  height: 48px;
+}
+
+@media (max-width: 390px) {
+  .ascii-scan {
+    gap: 8px;
+    padding: 8px;
+    font-size: 10px;
+  }
+  .ascii-scan .lottie-art {
+    flex-basis: 42px;
+    width: 42px;
+    height: 36px;
+  }
+}

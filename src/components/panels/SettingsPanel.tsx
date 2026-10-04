@@ -1,4 +1,5 @@
 import { useAppStore } from "../../store/appStore";
+import { AsciiScanLoader } from "../extras/AsciiExtras";
 import type {
   MotionPreference,
   ThemePreference,
@@ -53,6 +54,7 @@ export function SettingsPanel() {
   return (
     <GlassPanel view="settings" eyebrow="Make the playground yours">
       <section className="settings-section">
+        {status === "scanning" && <AsciiScanLoader />}
         <div className="settings-section__heading">
           <div>
             <h3>Music folders</h3>

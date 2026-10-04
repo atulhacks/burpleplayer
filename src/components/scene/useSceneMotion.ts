@@ -3,6 +3,7 @@ import { listen } from "@tauri-apps/api/event";
 import { gsap } from "gsap";
 import { desktopAvailable } from "../../lib/playerApi";
 import type { SpectrumEvent } from "../../lib/playerApi";
+import { PAUSED_LCD_ASCII, spectrumAsciiRows } from "../../lib/ascii";
 import { useAppStore } from "../../store/appStore";
 import { usePlayerStore } from "../../store/playerStore";
 
@@ -11,7 +12,7 @@ type Setter = (value: number) => void;
 export function useSceneMotion(
   stageRef: RefObject<HTMLDivElement | null>,
   bars: RefObject<(SVGRectElement | null)[]>,
-  ascii: RefObject<SVGTextElement | null>,
+  ascii: RefObject<(SVGTextElement | null)[]>,
 ) {
   useEffect(() => {
     const stage = stageRef.current;
@@ -52,6 +53,7 @@ export function useSceneMotion(
     let reduced =
       preference === "reduced" || (preference === "system" && media.matches);
     let bands = Array<number>(16).fill(0);
+    let spectrumFrame = 0;
     let energy = 0;
     let bass = 0;
     let theta = 0;
@@ -63,6 +65,13 @@ export function useSceneMotion(
     let attached = false;
     let active = true;
     let unlisten: (() => void) | undefined;
+
+    function drawAscii(rows: readonly string[]) {
+      rows.forEach((row, index) => {
+        if (ascii.current[index]) ascii.current[index].textContent = row;
+      });
+    }
+    drawAscii(PAUSED_LCD_ASCII);
 
     function resetTransforms() {
       theta = 0;
@@ -135,6 +144,9 @@ export function useSceneMotion(
 
     const unsubscribePlayback = usePlayerStore.subscribe((state, previous) => {
       playback = state.playback;
+      if (!playback.playing && previous.playback.playing) {
+        drawAscii(PAUSED_LCD_ASCII);
+      }
       if (playback.track?.id !== previous.playback.track?.id && !reduced) {
         velocity += playback.playing ? 10 : 5;
         kick = 1;
@@ -160,11 +172,14 @@ export function useSceneMotion(
       void listen<SpectrumEvent>("player:spectrum", (event) => {
         if (!active || document.hidden) return;
         bands = event.payload.bands;
-        if (ascii.current) {
-          const glyphs = " .:-=+*#%@";
-          ascii.current.textContent = bands
-            .map((band) => glyphs[Math.min(9, Math.floor((band / 255) * 10))])
-            .join("");
+        const mode = useAppStore.getState().visualizerMode;
+        if (mode === "ascii") {
+          drawAscii(
+            playback.playing
+              ? spectrumAsciiRows(bands, spectrumFrame++)
+              : PAUSED_LCD_ASCII,
+          );
+          return;
         }
         for (let index = 0; index < 16; index += 1) {
           const bar = bars.current[index];

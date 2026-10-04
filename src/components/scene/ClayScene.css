@@ -33,8 +33,10 @@
   font-size: 6.5px;
 }
 .lcd-copy--ascii {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: 7px;
-  letter-spacing: -0.9px;
+  font-weight: 700;
+  letter-spacing: 0;
 }
 
 .scene-hotspot {

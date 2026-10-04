@@ -14,6 +14,7 @@ interface PlayerStore {
   tracks: Track[];
   folders: string[];
   playlists: Playlist[];
+  importCelebrationId: number;
   status: PlayerStatus;
   error: string | null;
   applyPlayback: (playback: PlaybackState) => void;
@@ -41,6 +42,7 @@ interface PlayerStore {
   deletePlaylist: (id: number) => Promise<void>;
   addToPlaylist: (playlistId: number, trackId: number) => Promise<void>;
   removeFromPlaylist: (playlistId: number, trackId: number) => Promise<void>;
+  toggleFavorite: (trackId: number) => Promise<boolean>;
 }
 
 const initialPlayback: PlaybackState = {
@@ -75,6 +77,7 @@ export const usePlayerStore = create<PlayerStore>((set, get) => {
     tracks: [],
     folders: [],
     playlists: [],
+    importCelebrationId: 0,
     status: desktopAvailable ? "loading" : "web-preview",
     error: null,
     applyPlayback: (playback) => set({ playback, error: null }),
@@ -133,7 +136,13 @@ export const usePlayerStore = create<PlayerStore>((set, get) => {
         set({ status: "scanning", error: null });
         const tracks = await playerApi.scanFolder(path);
         const folders = await playerApi.getFolders();
-        set({ tracks, folders, status: "ready" });
+        set((state) => ({
+          tracks,
+          folders,
+          status: "ready",
+          importCelebrationId:
+            state.importCelebrationId + (tracks.length > 0 ? 1 : 0),
+        }));
         if (tracks.length === 0) {
           set({ error: "No supported audio files found in that folder." });
         }
@@ -198,6 +207,33 @@ export const usePlayerStore = create<PlayerStore>((set, get) => {
         set({ playlists: await playerApi.getPlaylists(), error: null });
       } catch (error) {
         set({ error: errorMessage(error) });
+      }
+    },
+    toggleFavorite: async (trackId) => {
+      if (!desktopAvailable) {
+        set({ error: "Open the Tauri desktop app to save favorites." });
+        return false;
+      }
+      try {
+        let favorite = get().playlists.find(
+          (playlist) => playlist.name.toLocaleLowerCase() === "favorites",
+        );
+        if (!favorite) {
+          await playerApi.createPlaylist("Favorites");
+          const playlists = await playerApi.getPlaylists();
+          favorite = playlists.find(
+            (playlist) => playlist.name.toLocaleLowerCase() === "favorites",
+          );
+        }
+        if (!favorite) throw new Error("Favorites playlist was not created.");
+        const saved = favorite.tracks.some((track) => track.id === trackId);
+        if (saved) await playerApi.removeFromPlaylist(favorite.id, trackId);
+        else await playerApi.addToPlaylist(favorite.id, trackId);
+        set({ playlists: await playerApi.getPlaylists(), error: null });
+        return !saved;
+      } catch (error) {
+        set({ error: errorMessage(error) });
+        return false;
       }
     },
   };

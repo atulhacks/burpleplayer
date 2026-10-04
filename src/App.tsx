@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { NowPlayingDock } from "./components/controls/NowPlayingDock";
+import { LottieArt } from "./components/extras/LottieArt";
 import { LibraryPanel } from "./components/panels/LibraryPanel";
 import { QueuePanel } from "./components/panels/QueuePanel";
 import { SettingsPanel } from "./components/panels/SettingsPanel";
@@ -32,6 +33,10 @@ export default function App() {
   const error = usePlayerStore((state) => state.error);
   const setError = usePlayerStore((state) => state.setError);
   const importFolder = usePlayerStore((state) => state.importFolder);
+  const importCelebrationId = usePlayerStore(
+    (state) => state.importCelebrationId,
+  );
+  const [dismissedCelebration, setDismissedCelebration] = useState(0);
 
   useEffect(() => {
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -270,6 +275,23 @@ export default function App() {
             type="button"
             aria-label="Dismiss error"
             onClick={() => setError(null)}
+          >
+            ×
+          </button>
+        </div>
+      )}
+      {importCelebrationId > dismissedCelebration && (
+        <div className="import-celebration" role="status">
+          <LottieArt
+            key={importCelebrationId}
+            kind="confetti"
+            onComplete={() => setDismissedCelebration(importCelebrationId)}
+          />
+          <span>Music is in your library!</span>
+          <button
+            type="button"
+            aria-label="Dismiss import celebration"
+            onClick={() => setDismissedCelebration(importCelebrationId)}
           >
             ×
           </button>

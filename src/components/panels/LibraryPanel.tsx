@@ -1,6 +1,8 @@
 import { useMemo, useState } from "react";
 import type { FormEvent } from "react";
 import type { Track } from "../../lib/playerApi";
+import { AsciiScanLoader, EmptyLibraryAscii } from "../extras/AsciiExtras";
+import { LottieArt } from "../extras/LottieArt";
 import { useAppStore } from "../../store/appStore";
 import { usePlayerStore } from "../../store/playerStore";
 import { GlassPanel } from "./GlassPanel";
@@ -149,6 +151,7 @@ function TrackList({
 
 export function LibraryPanel() {
   const tracks = usePlayerStore((state) => state.tracks);
+  const status = usePlayerStore((state) => state.status);
   const folders = usePlayerStore((state) => state.folders);
   const playlists = usePlayerStore((state) => state.playlists);
   const importFolder = usePlayerStore((state) => state.importFolder);
@@ -204,6 +207,7 @@ export function LibraryPanel() {
       view="library"
       eyebrow={`${tracks.length} songs in your little world`}
     >
+      {status === "scanning" && <AsciiScanLoader />}
       <label className="panel-search">
         <span className="sr-only">Search your library</span>
         <span aria-hidden="true">⌕</span>
@@ -232,13 +236,22 @@ export function LibraryPanel() {
             <TrackList tracks={filtered} />
           ) : (
             <div className="panel-empty">
-              <span aria-hidden="true">♫</span>
+              {!tracks.length && status !== "scanning" ? (
+                <div className="panel-empty__art">
+                  <LottieArt kind="empty" loop />
+                  <EmptyLibraryAscii />
+                </div>
+              ) : (
+                <span aria-hidden="true">♫</span>
+              )}
               <p>
-                {tracks.length
-                  ? "Nothing matches that search."
-                  : "Your library is waiting for music."}
+                {status === "scanning"
+                  ? "Searching the shelves for songs…"
+                  : tracks.length
+                    ? "Nothing matches that search."
+                    : "Your library is waiting for music."}
               </p>
-              {!tracks.length && (
+              {!tracks.length && status !== "scanning" && (
                 <button type="button" onClick={() => void importFolder()}>
                   Add music folder
                 </button>

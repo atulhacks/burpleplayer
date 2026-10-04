@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { LottieArt } from "../extras/LottieArt";
 import { usePlayerStore } from "../../store/playerStore";
 
 function clock(milliseconds: number): string {
@@ -38,6 +39,7 @@ function Icon({ name }: { name: "play" | "pause" | "previous" | "next" }) {
 export function NowPlayingDock() {
   const playback = usePlayerStore((state) => state.playback);
   const tracks = usePlayerStore((state) => state.tracks);
+  const playlists = usePlayerStore((state) => state.playlists);
   const status = usePlayerStore((state) => state.status);
   const toggle = usePlayerStore((state) => state.toggle);
   const previous = usePlayerStore((state) => state.previous);
@@ -45,9 +47,12 @@ export function NowPlayingDock() {
   const seek = usePlayerStore((state) => state.seek);
   const setVolume = usePlayerStore((state) => state.setVolume);
   const importFolder = usePlayerStore((state) => state.importFolder);
+  const toggleFavorite = usePlayerStore((state) => state.toggleFavorite);
   const [seekDraft, setSeekDraft] = useState<number | null>(null);
   const [volumeDraft, setVolumeDraft] = useState<number | null>(null);
   const [expanded, setExpanded] = useState(false);
+  const [favoriteBusy, setFavoriteBusy] = useState(false);
+  const [heartBurst, setHeartBurst] = useState(0);
 
   useEffect(() => {
     setSeekDraft(null);
@@ -59,6 +64,11 @@ export function NowPlayingDock() {
   const duration = playback.track?.durationMs ?? 0;
   const position = seekDraft ?? Math.min(playback.positionMs, duration);
   const volume = volumeDraft ?? playback.volume;
+  const isFavorite = playlists.some(
+    (playlist) =>
+      playlist.name.toLocaleLowerCase() === "favorites" &&
+      playlist.tracks.some((track) => track.id === playback.track?.id),
+  );
   const title =
     playback.track?.title ??
     (tracks.length ? "Ready when you are" : "A little music for the clouds");
@@ -76,6 +86,14 @@ export function NowPlayingDock() {
   function commitVolume() {
     if (volumeDraft !== null) void setVolume(volumeDraft);
     setVolumeDraft(null);
+  }
+
+  async function changeFavorite() {
+    if (!playback.track || favoriteBusy) return;
+    setFavoriteBusy(true);
+    const added = await toggleFavorite(playback.track.id);
+    if (added) setHeartBurst((value) => value + 1);
+    setFavoriteBusy(false);
   }
 
   return (
@@ -96,6 +114,31 @@ export function NowPlayingDock() {
           <strong title={title}>{title}</strong>
           <span title={artist}>{artist}</span>
         </div>
+        {playback.track && (
+          <button
+            type="button"
+            className="now-dock__favorite"
+            aria-label={
+              isFavorite ? "Remove from favorites" : "Add to favorites"
+            }
+            aria-pressed={isFavorite}
+            disabled={favoriteBusy}
+            onClick={() => void changeFavorite()}
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 21 3.6 12.8C-0.2 9.1 2.4 3 7.4 3c2 0 3.5 1 4.6 2.5C13.1 4 14.6 3 16.6 3c5 0 7.6 6.1 3.8 9.8Z" />
+            </svg>
+            {heartBurst > 0 && (
+              <span
+                key={heartBurst}
+                className="now-dock__heart-burst"
+                aria-hidden="true"
+              >
+                <LottieArt kind="heart" onComplete={() => setHeartBurst(0)} />
+              </span>
+            )}
+          </button>
+        )}
         {tracks.length === 0 ? (
           <button
             type="button"

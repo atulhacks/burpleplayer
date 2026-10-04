@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import { cubeColorForTrack, fallbackCubeColor } from "../../lib/artPalette";
+import { LCD_ASCII_ROWS } from "../../lib/ascii";
 import type { Track } from "../../lib/playerApi";
 import { useAppStore } from "../../store/appStore";
 import { usePlayerStore } from "../../store/playerStore";
@@ -360,7 +361,7 @@ function LcdDisplay({
   ascii,
 }: {
   bars: React.RefObject<(SVGRectElement | null)[]>;
-  ascii: React.RefObject<SVGTextElement | null>;
+  ascii: React.RefObject<(SVGTextElement | null)[]>;
 }) {
   const track = usePlayerStore((state) => state.playback.track);
   const positionMs = usePlayerStore((state) => state.playback.positionMs);
@@ -377,6 +378,11 @@ function LcdDisplay({
         : playing
           ? "playing"
           : "paused";
+  const asciiActive =
+    visualizerMode === "ascii" &&
+    !!track &&
+    face !== "error" &&
+    face !== "loading";
 
   return (
     <g clipPath="url(#lcd-clip)">
@@ -400,7 +406,7 @@ function LcdDisplay({
           </text>
         </>
       )}
-      <g data-motion-face>
+      <g data-motion-face opacity={asciiActive ? 0 : 1}>
         <g data-motion-eyes>
           {face === "error" ? (
             <>
@@ -474,18 +480,25 @@ function LcdDisplay({
           height="1"
           rx="0.5"
           fill="var(--lcd-ink)"
-          opacity={visualizerMode === "bars" ? (track ? 0.88 : 0.28) : 0}
+          opacity={asciiActive ? 0 : track ? 0.88 : 0.28}
         />
       ))}
-      <text
-        ref={ascii}
-        x="529"
-        y="694"
-        className="lcd-copy lcd-copy--ascii"
-        opacity={visualizerMode === "ascii" ? 0.85 : 0}
-      >
-        ................
-      </text>
+      <g opacity={asciiActive ? 0.88 : 0}>
+        {Array.from({ length: LCD_ASCII_ROWS }, (_, index) => (
+          <text
+            key={index}
+            ref={(element) => {
+              ascii.current[index] = element;
+            }}
+            x="532"
+            y={612 + index * 8}
+            className="lcd-copy lcd-copy--ascii"
+            xmlSpace="preserve"
+          >
+            {" ".repeat(20)}
+          </text>
+        ))}
+      </g>
     </g>
   );
 }
@@ -495,7 +508,7 @@ function Player({
   ascii,
 }: {
   bars: React.RefObject<(SVGRectElement | null)[]>;
-  ascii: React.RefObject<SVGTextElement | null>;
+  ascii: React.RefObject<(SVGTextElement | null)[]>;
 }) {
   return (
     <g className="player" aria-hidden="true">
@@ -876,7 +889,8 @@ function SceneDefs() {
 export function ClayScene() {
   const stageRef = useRef<HTMLDivElement>(null);
   const bars = useRef<(SVGRectElement | null)[]>([]);
-  const ascii = useRef<SVGTextElement>(null);
+  const ascii = useRef<(SVGTextElement | null)[]>([]);
+  if (!Array.isArray(ascii.current)) ascii.current = [];
   useSceneMotion(stageRef, bars, ascii);
   const queue = usePlayerStore((state) => state.playback.queue);
   const queueIndex = usePlayerStore((state) => state.playback.queueIndex);

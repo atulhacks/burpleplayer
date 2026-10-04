@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { EmptyLibraryAscii } from "../extras/AsciiExtras";
 import { useAppStore } from "../../store/appStore";
 import { usePlayerStore } from "../../store/playerStore";
 import { GlassPanel } from "./GlassPanel";
@@ -16,7 +17,7 @@ export function QueuePanel() {
     <GlassPanel view="queue" eyebrow={`${queue.length} songs in line`}>
       {queue.length === 0 ? (
         <div className="panel-empty">
-          <span aria-hidden="true">♫</span>
+          <EmptyLibraryAscii />
           <p>Your queue is waiting for its first song.</p>
           <button type="button" onClick={() => setView("library")}>
             Browse library

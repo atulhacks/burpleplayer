@@ -310,6 +310,20 @@ a:focus-visible {
   line-height: 1;
 }
 
+.panel-empty__art {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  max-width: 100%;
+}
+
+.panel-empty__art .lottie-art {
+  flex: 0 0 95px;
+  width: 95px;
+  height: 95px;
+}
+
 .panel-empty p {
   margin: 0;
   font-size: 14px;
@@ -691,6 +705,49 @@ a:focus-visible {
   height: 30%;
 }
 
+.import-celebration {
+  position: absolute;
+  z-index: 11;
+  right: 20px;
+  bottom: 88px;
+  left: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 49px;
+  padding: 7px 10px;
+  border: 1px solid rgb(255 255 255 / 84%);
+  border-radius: 16px;
+  background: rgb(255 247 229 / 96%);
+  box-shadow: 0 10px 30px rgb(53 36 70 / 20%);
+  color: var(--plum);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.import-celebration .lottie-art {
+  position: absolute;
+  inset: -60px 0 auto;
+  width: 100%;
+  height: 120px;
+}
+
+.import-celebration span,
+.import-celebration button {
+  position: relative;
+  z-index: 1;
+}
+
+.import-celebration button {
+  margin-left: auto;
+  border: 0;
+  background: transparent;
+  color: var(--plum);
+  font-size: 20px;
+  cursor: pointer;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -858,6 +915,57 @@ a:focus-visible {
 .now-dock__identity span {
   font-size: 11px;
   color: #654964;
+}
+
+.now-dock__favorite {
+  position: relative;
+  display: grid;
+  flex: 0 0 29px;
+  place-items: center;
+  width: 29px;
+  height: 29px;
+  padding: 4px;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(91 58 122 / 10%);
+  color: var(--plum);
+  cursor: pointer;
+}
+
+.now-dock__favorite[aria-pressed="true"] {
+  color: #b23475;
+}
+
+.now-dock__favorite svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+.now-dock__favorite[aria-pressed="true"] svg {
+  fill: currentColor;
+}
+
+.now-dock__heart-burst {
+  position: absolute;
+  z-index: 2;
+  top: -28px;
+  left: -25px;
+  width: 80px;
+  height: 80px;
+  pointer-events: none;
+}
+
+.app-shell[data-motion-preference="reduced"] .now-dock__heart-burst {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-shell:not([data-motion-preference="full"]) .now-dock__heart-burst {
+    display: none;
+  }
 }
 
 .now-dock__transport {
