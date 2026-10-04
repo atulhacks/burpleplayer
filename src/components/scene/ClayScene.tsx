@@ -275,7 +275,7 @@ function Pillars() {
 
 function Rope({ x, top }: { x: number; top: number }) {
   return (
-    <g className="rope" aria-hidden="true">
+    <g className="rope" data-swing-rope={x} aria-hidden="true">
       <path
         d={`M${x} ${top - 10}V880`}
         stroke="var(--rope-shadow)"
@@ -300,6 +300,13 @@ function Rope({ x, top }: { x: number; top: number }) {
           />
         ) : null;
       })}
+    </g>
+  );
+}
+
+function SwingRing({ x, top }: { x: number; top: number }) {
+  return (
+    <g aria-hidden="true">
       <ellipse
         cx={x}
         cy={top - 61}
@@ -992,7 +999,11 @@ export function ClayScene() {
         <g data-scene-layer="swing">
           <Rope x={433} top={270} />
           <Rope x={723} top={291} />
-          <Player bars={bars} ascii={ascii} />
+          <g data-swing-player>
+            <Player bars={bars} ascii={ascii} />
+          </g>
+          <SwingRing x={433} top={270} />
+          <SwingRing x={723} top={291} />
         </g>
         <g data-scene-layer="cubes">
           <Cube x={111} y={1198} size={63} color="red" rotate={-3} />

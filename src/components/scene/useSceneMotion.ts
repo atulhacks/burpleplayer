@@ -21,6 +21,13 @@ export function useSceneMotion(
     const swing = stage.querySelector<SVGGElement>(
       '[data-scene-layer="swing"]',
     );
+    const leftRope = stage.querySelector<SVGGElement>(
+      '[data-swing-rope="433"]',
+    );
+    const rightRope = stage.querySelector<SVGGElement>(
+      '[data-swing-rope="723"]',
+    );
+    const player = stage.querySelector<SVGGElement>("[data-swing-player]");
     const back = stage.querySelector<SVGGElement>(
       '[data-scene-layer="clouds-back"]',
     );
@@ -35,12 +42,27 @@ export function useSceneMotion(
     const cubes = Array.from(
       stage.querySelectorAll<SVGGElement>("[data-motion-cube]"),
     );
-    if (!swing || !back || !middle || !front || !face || !eyes) return;
+    if (
+      !swing ||
+      !leftRope ||
+      !rightRope ||
+      !player ||
+      !back ||
+      !middle ||
+      !front ||
+      !face ||
+      !eyes
+    )
+      return;
 
-    gsap.set(swing, { svgOrigin: "578 220" });
+    gsap.set(leftRope, { svgOrigin: "433 260" });
+    gsap.set(rightRope, { svgOrigin: "723 281" });
     gsap.set(eyes, { svgOrigin: "591 624" });
     gsap.set(front, { x: 0 });
-    const setSwing = gsap.quickSetter(swing, "rotation") as Setter;
+    const setLeftRope = gsap.quickSetter(leftRope, "rotation") as Setter;
+    const setRightRope = gsap.quickSetter(rightRope, "rotation") as Setter;
+    const setPlayerX = gsap.quickSetter(player, "x") as Setter;
+    const setPlayerY = gsap.quickSetter(player, "y") as Setter;
     const setBack = gsap.quickSetter(back, "x") as Setter;
     const setMiddle = gsap.quickSetter(middle, "x") as Setter;
     const setFace = gsap.quickSetter(face, "y") as Setter;
@@ -79,7 +101,10 @@ export function useSceneMotion(
       theta = 0;
       velocity = 0;
       kick = 0;
-      setSwing(0);
+      setLeftRope(0);
+      setRightRope(0);
+      setPlayerX(0);
+      setPlayerY(0);
       setBack(0);
       setMiddle(0);
       setFace(0);
@@ -101,13 +126,17 @@ export function useSceneMotion(
       bass += (targetBass - bass) * smoothing;
       kick *= Math.exp(-dt * 6);
 
-      swingPhase += dt * (0.95 + energy * 0.25);
+      swingPhase += dt * (1.25 + energy * 0.3);
       const amplitude =
-        2.8 + (playback.playing ? energy * playback.volume * 2.2 : 0);
+        5 + (playback.playing ? energy * playback.volume * 1.5 : 0);
       const targetAngle = Math.sin(swingPhase) * amplitude;
       velocity += ((targetAngle - theta) * 55 - velocity * 10) * dt;
-      theta = Math.max(-5.5, Math.min(5.5, theta + velocity * dt));
-      setSwing(theta);
+      theta = Math.max(-7, Math.min(7, theta + velocity * dt));
+      setLeftRope(theta);
+      setRightRope(theta);
+      const radians = (theta * Math.PI) / 180;
+      setPlayerX(-610 * Math.sin(radians));
+      setPlayerY(610 * (Math.cos(radians) - 1));
 
       setBack(Math.sin(phase * 0.22) * 8);
       setMiddle(Math.sin(phase * 0.33 + 1.2) * 13);
@@ -203,9 +232,22 @@ export function useSceneMotion(
       media.removeEventListener("change", onMediaChange);
       document.removeEventListener("visibilitychange", syncTicker);
       unlisten?.();
-      gsap.set([swing, back, middle, front, face, eyes, ...cubes], {
-        clearProps: "transform",
-      });
+      gsap.set(
+        [
+          leftRope,
+          rightRope,
+          player,
+          back,
+          middle,
+          front,
+          face,
+          eyes,
+          ...cubes,
+        ],
+        {
+          clearProps: "transform",
+        },
+      );
     };
   }, [stageRef, bars, ascii]);
 }
