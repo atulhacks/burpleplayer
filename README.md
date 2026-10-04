@@ -4,7 +4,15 @@ A portrait desktop music player built with Tauri 2, Rust, React, TypeScript, Vit
 
 ## Status
 
-**Milestones 0–7 complete; milestone 8 pending:** the clay playground is wired to the Rust audio engine, has its motion pass, and opens full Library, Queue, and Settings glass panels with a cloud-wipe transition. The console D-pad, A/B buttons, LCD, queue cubes, native music-folder picker, and compact Now Playing dock are interactive. Rust decodes and plays local music, owns the queue and persistent library, and emits playback and spectrum updates. Authored Lottie-format SVG animations and ASCII extras are now present. Accessibility fixes and measured frame timings are in [`docs/accessibility-performance-audit.md`](docs/accessibility-performance-audit.md); the 60 fps target is not yet verified.
+**Milestones 0–8 implemented:** the clay playground is wired to the Rust audio engine, has its motion pass, and opens full Library, Queue, and Settings glass panels with a cloud-wipe transition. The console D-pad, A/B buttons, LCD, queue cubes, native music-folder picker, and compact Now Playing dock are interactive. Rust decodes and plays local music, owns the queue and persistent library, and emits playback and spectrum updates. Authored Lottie-format SVG animations and ASCII extras are now present. Accessibility fixes and measured frame timings are in [`docs/accessibility-performance-audit.md`](docs/accessibility-performance-audit.md); the 60 fps target remains unverified on this host.
+
+## Screenshots
+
+macOS release build, with the native titlebar cropped from the captures:
+
+| Now Playing                                                                                                                             | Queue                                                                                                   |
+| --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| <img src="docs/screenshots/now-playing.jpg" alt="The clay console swinging between pastel pillars in the Now Playing view" width="320"> | <img src="docs/screenshots/queue.jpg" alt="The glass Queue panel over the clay playground" width="320"> |
 
 ## Development
 
@@ -24,7 +32,7 @@ For a Rust-only check:
 cargo check --manifest-path src-tauri/Cargo.toml
 ```
 
-On the current macOS workstation, a debug app bundle built successfully with `SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk`. Other platforms should use their normal SDK selection.
+On the current macOS workstation, the release `.app` and `.dmg` build with `SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk pnpm tauri build`. Other platforms should use their normal SDK selection.
 
 ## Architecture
 
@@ -38,11 +46,11 @@ On the current macOS workstation, a debug app bundle built successfully with `SD
 - `src-tauri/src/library/` — tags, artwork, SQLite, scans, and playlists.
 - `src-tauri/src/ipc/` — commands and event payloads.
 
-Rust is the source of truth for playback and library data. The frontend only sends commands and renders backend snapshots/events. The native Tauri dialog selects a folder; Rust scans it. `src-tauri/src/README.md` lists the command and event contract.
+Rust is the source of truth for playback and library data. The frontend only sends commands and renders backend snapshots/events. The native Tauri dialog selects a folder; Rust scans it. `src-tauri/src/README.md` lists the command and event contract. The bundle identifier is now `com.burpleplayer.desktop`; first launch copies the previous `com.burpleplayer.app` SQLite library with `VACUUM INTO`, leaving the original intact.
 
 The scene in `src/components/scene/ClayScene.tsx` is layered SVG/CSS, not the reference image used as a background. The LCD draws live track text, time, face, and a 16-band spectrum. Up to six upcoming tracks appear as cubes; album art supplies their color when available. The hot spectrum path updates SVG bars through refs without rerendering React at 30 Hz.
 
-`src/components/scene/useSceneMotion.ts` owns one GSAP ticker callback for the scene: a damped swing spring driven by volume and spectrum energy, staggered bass/kick cube hops, three cloud parallax layers, and a softly bobbing/blinking LCD face. The same spectrum listener feeds motion and LCD bars or a simple ASCII readout. Animation suspends when the document is hidden; OS reduced-motion and the app's `system`/`reduced`/`full` preference disable scene motion without stopping LCD updates. Button, D-pad, and slider feedback uses transform-only CSS transitions with a reduced-motion override.
+`src/components/scene/useSceneMotion.ts` owns one GSAP ticker callback for the scene: a gently continuous spring-driven swing that expands with volume and spectrum energy, staggered bass/kick cube hops, two drifting cloud layers and a static soft foreground, and a softly bobbing/blinking LCD face. The same spectrum listener feeds motion and LCD bars or a simple ASCII readout. Animation suspends when the document is hidden; OS reduced-motion and the app's `system`/`reduced`/`full` preference disable scene motion without stopping LCD updates. Button, D-pad, and slider feedback uses transform-only CSS transitions with a reduced-motion override.
 
 The persistent view switcher keeps the scene behind the tinted glass panels. Normal navigation runs an interruptible, 0.6-second GSAP cloud wipe while the pillars part; reduced motion uses a short fade. Library has song search, album/artist/folder browsing, playlists, and play/enqueue actions. Queue supports drag reorder and keyboard-operable move/remove buttons. Settings manages scanned folders, sunny/twilight themes, motion preference, and bar/ASCII LCD modes. UI preferences persist locally; Rust remains authoritative for tracks, playlists, and playback.
 

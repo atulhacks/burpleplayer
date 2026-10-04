@@ -2,10 +2,43 @@ use std::path::{Path, PathBuf};
 
 use lofty::file::{AudioFile, TaggedFileExt};
 use lofty::tag::Accessor;
-use rusqlite::{params, Connection, OptionalExtension};
+use rusqlite::{params, Connection, OpenFlags, OptionalExtension};
 use walkdir::WalkDir;
 
 use crate::models::{AlbumArt, Playlist, Track};
+
+pub fn migrate_legacy_library(data_dir: &Path) -> Result<(), String> {
+    let destination = data_dir.join("library.sqlite3");
+    if destination.exists() {
+        return Ok(());
+    }
+    let Some(parent) = data_dir.parent() else {
+        return Ok(());
+    };
+    let previous = parent.join("com.burpleplayer.app/library.sqlite3");
+    if !previous.is_file() {
+        return Ok(());
+    }
+
+    std::fs::create_dir_all(data_dir).map_err(|error| error.to_string())?;
+    let temporary = data_dir.join(format!("library.sqlite3.migrating-{}", std::process::id()));
+    if temporary.exists() {
+        return Err(format!(
+            "Previous library migration file already exists: {}",
+            temporary.display()
+        ));
+    }
+    let temporary_string = temporary
+        .to_str()
+        .ok_or_else(|| "Library data path is not valid UTF-8".to_owned())?;
+    let source = Connection::open_with_flags(&previous, OpenFlags::SQLITE_OPEN_READ_ONLY)
+        .map_err(|error| error.to_string())?;
+    source
+        .execute("VACUUM INTO ?1", [temporary_string])
+        .map_err(|error| error.to_string())?;
+    std::fs::rename(&temporary, &destination).map_err(|error| error.to_string())?;
+    Ok(())
+}
 
 #[derive(Clone)]
 pub struct Library {

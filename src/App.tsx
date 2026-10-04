@@ -74,6 +74,20 @@ export default function App() {
     if (view === renderedRef.current && !timelineRef.current) return;
 
     timelineRef.current?.kill();
+    timelineRef.current = null;
+    if (document.hidden) {
+      wipe.style.visibility = "hidden";
+      progressRef.current.value = 0;
+      gsap.set(left, { x: view === "now-playing" ? 0 : -92 });
+      gsap.set(right, { x: view === "now-playing" ? 0 : 92 });
+      gsap.set([crossbar, swing], {
+        opacity: view === "now-playing" ? 1 : 0.55,
+      });
+      gsap.set(panel, { opacity: 1 });
+      renderedRef.current = view;
+      setRenderedView(view);
+      return;
+    }
     const reduced =
       motionPreference === "reduced" ||
       (motionPreference === "system" && systemReduced);

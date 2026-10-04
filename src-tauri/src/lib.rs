@@ -11,6 +11,7 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .setup(|app| {
             let data_dir = app.path().app_data_dir()?;
+            library::migrate_legacy_library(&data_dir).map_err(std::io::Error::other)?;
             let library = library::Library::open(data_dir.join("library.sqlite3"))
                 .map_err(std::io::Error::other)?;
             app.manage(library);
@@ -140,6 +141,30 @@ mod tests {
         std::fs::remove_file(path).unwrap();
         assert!(reopened.scan_folder(&music).unwrap().is_empty());
         assert!(reopened.playlists().unwrap()[0].tracks.is_empty());
+    }
+
+    #[test]
+    fn migrates_library_when_bundle_identifier_changes() {
+        let dir = TestDir::new();
+        let music = dir.0.join("music");
+        std::fs::create_dir(&music).unwrap();
+        write_wav(&music.join("tone.wav"));
+
+        let previous_path = dir.0.join("com.burpleplayer.app/library.sqlite3");
+        let previous = Library::open(previous_path.clone()).unwrap();
+        let tracks = previous.scan_folder(&music).unwrap();
+        let playlist_id = previous.create_playlist("Favorites").unwrap();
+        previous.add_to_playlist(playlist_id, tracks[0].id).unwrap();
+
+        let data_dir = dir.0.join("com.burpleplayer.desktop");
+        crate::library::migrate_legacy_library(&data_dir).unwrap();
+        let migrated = Library::open(data_dir.join("library.sqlite3")).unwrap();
+        assert_eq!(migrated.tracks().unwrap()[0].id, tracks[0].id);
+        assert_eq!(migrated.playlists().unwrap()[0].tracks[0].id, tracks[0].id);
+        assert!(previous_path.is_file());
+
+        crate::library::migrate_legacy_library(&data_dir).unwrap();
+        assert_eq!(migrated.tracks().unwrap().len(), 1);
     }
 
     #[test]
