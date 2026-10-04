@@ -39,15 +39,7 @@ function Cloud({
       className={foreground ? "cloud cloud--foreground" : "cloud"}
       transform={`translate(${x} ${y}) scale(${flip ? -scale : scale} ${scale})`}
     >
-      <ellipse
-        cx="0"
-        cy="21"
-        rx="128"
-        ry="47"
-        fill="var(--cloud-shadow)"
-        opacity="0.3"
-        filter="url(#cloud-shadow)"
-      />
+      <ellipse cx="0" cy="21" rx="128" ry="47" fill="url(#cloud-soft-shadow)" />
       <ellipse cx="-54" cy="20" rx="73" ry="67" fill="url(#cloud-gradient)" />
       <circle cx="-19" cy="-28" r="67" fill="url(#cloud-gradient)" />
       <circle cx="56" cy="13" r="62" fill="url(#cloud-gradient)" />
@@ -285,13 +277,13 @@ function Rope({ x, top }: { x: number; top: number }) {
   return (
     <g className="rope" aria-hidden="true">
       <path
-        d={`M${x} ${top}V880`}
+        d={`M${x} ${top - 10}V880`}
         stroke="var(--rope-shadow)"
         strokeWidth="17"
         strokeLinecap="round"
       />
       <path
-        d={`M${x - 2} ${top}V880`}
+        d={`M${x - 2} ${top - 10}V880`}
         stroke="url(#rope-gradient)"
         strokeWidth="12"
         strokeLinecap="round"
@@ -310,21 +302,21 @@ function Rope({ x, top }: { x: number; top: number }) {
       })}
       <ellipse
         cx={x}
-        cy={top - 49}
-        rx="23"
-        ry="56"
+        cy={top - 61}
+        rx="20"
+        ry="44"
         fill="none"
         stroke="var(--ring-shadow)"
-        strokeWidth="20"
+        strokeWidth="16"
       />
       <ellipse
         cx={x - 4}
-        cy={top - 51}
-        rx="21"
-        ry="54"
+        cy={top - 63}
+        rx="18"
+        ry="42"
         fill="none"
         stroke="url(#ring-gradient)"
-        strokeWidth="15"
+        strokeWidth="11"
       />
     </g>
   );
@@ -471,13 +463,14 @@ function LcdDisplay({
       {Array.from({ length: 16 }, (_, index) => (
         <rect
           key={index}
+          className="lcd-spectrum-bar"
           ref={(element) => {
             bars.current[index] = element;
           }}
           x={529 + index * 7.6}
-          y="695"
+          y="683"
           width="5"
-          height="1"
+          height="13"
           rx="0.5"
           fill="var(--lcd-ink)"
           opacity={asciiActive ? 0 : track ? 0.88 : 0.28}
@@ -823,6 +816,11 @@ function SceneDefs() {
         <stop offset="0.65" className="stop-cloud" />
         <stop offset="1" className="stop-cloud-shade" />
       </radialGradient>
+      <radialGradient id="cloud-soft-shadow">
+        <stop offset="0" stopColor="var(--cloud-shadow)" stopOpacity="0.36" />
+        <stop offset="0.7" stopColor="var(--cloud-shadow)" stopOpacity="0.16" />
+        <stop offset="1" stopColor="var(--cloud-shadow)" stopOpacity="0" />
+      </radialGradient>
       <linearGradient id="rope-gradient" x2="1" y2="0">
         <stop offset="0" className="stop-rope-dark" />
         <stop offset="0.5" className="stop-rope-light" />
@@ -867,9 +865,6 @@ function SceneDefs() {
         <stop offset="0" className="stop-base-light" />
         <stop offset="1" className="stop-base-dark" />
       </linearGradient>
-      <filter id="cloud-shadow" x="-35%" y="-35%" width="170%" height="170%">
-        <feGaussianBlur stdDeviation="15" />
-      </filter>
       <filter id="ground-soft" x="-50%" y="-100%" width="200%" height="300%">
         <feGaussianBlur stdDeviation="12" />
       </filter>

@@ -39,6 +39,12 @@
   letter-spacing: 0;
 }
 
+.lcd-spectrum-bar {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  transform: scaleY(0.077);
+}
+
 .scene-hotspot {
   position: absolute;
   z-index: 2;

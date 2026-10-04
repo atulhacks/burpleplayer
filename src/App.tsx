@@ -39,6 +39,19 @@ export default function App() {
   const [dismissedCelebration, setDismissedCelebration] = useState(0);
 
   useEffect(() => {
+    if (import.meta.env.VITE_PERF_AUDIT !== "1") return;
+    let dispose: (() => void) | undefined;
+    let active = true;
+    void import("./lib/performanceProbe").then(({ startPerformanceProbe }) => {
+      if (active) dispose = startPerformanceProbe();
+    });
+    return () => {
+      active = false;
+      dispose?.();
+    };
+  }, []);
+
+  useEffect(() => {
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
     const update = () => setSystemReduced(media.matches);
     media.addEventListener("change", update);
@@ -92,8 +105,6 @@ export default function App() {
     if (reduced) {
       wipe.style.visibility = "hidden";
       gsap.set([left, right], { x: 0 });
-      gsap.set(left, { x: view === "now-playing" ? 0 : -92 });
-      gsap.set(right, { x: view === "now-playing" ? 0 : 92 });
       gsap.set([crossbar, swing], {
         opacity: view === "now-playing" ? 1 : 0.55,
       });
@@ -187,9 +198,12 @@ export default function App() {
         event.altKey
       )
         return;
+      const target = event.target instanceof Element ? event.target : null;
       if (
-        event.target instanceof Element &&
-        event.target.closest("button, input, textarea, [contenteditable]")
+        target?.closest(
+          "input, select, textarea, [contenteditable], .view-panel",
+        ) ||
+        (event.key === " " && target?.closest("button"))
       )
         return;
       const player = usePlayerStore.getState();
@@ -228,9 +242,6 @@ export default function App() {
       data-motion-preference={motionPreference}
       data-theme={theme}
     >
-      <div className="scene-frame" ref={sceneRef}>
-        <ClayScene />
-      </div>
       <header className="titlebar" data-tauri-drag-region>
         <span data-tauri-drag-region>BurplePlayer</span>
         <button
@@ -262,6 +273,13 @@ export default function App() {
           </button>
         ))}
       </nav>
+      <div
+        className="scene-frame"
+        ref={sceneRef}
+        inert={renderedView !== "now-playing"}
+      >
+        <ClayScene />
+      </div>
       <div className="view-space" ref={panelRef}>
         {renderedView === "library" && <LibraryPanel />}
         {renderedView === "queue" && <QueuePanel />}

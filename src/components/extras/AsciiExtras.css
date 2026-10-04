@@ -42,6 +42,19 @@
   height: 48px;
 }
 
+.ascii-scan button {
+  flex: 0 0 auto;
+  margin-left: auto;
+  padding: 5px 7px;
+  border: 1px solid rgb(91 58 122 / 25%);
+  border-radius: 9px;
+  background: #fffaf5;
+  color: var(--plum);
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
 @media (max-width: 390px) {
   .ascii-scan {
     gap: 8px;

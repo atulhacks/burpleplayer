@@ -238,7 +238,7 @@ export function LibraryPanel() {
             <div className="panel-empty">
               {!tracks.length && status !== "scanning" ? (
                 <div className="panel-empty__art">
-                  <LottieArt kind="empty" loop />
+                  <LottieArt kind="empty" />
                   <EmptyLibraryAscii />
                 </div>
               ) : (

@@ -6,3 +6,4 @@ dist/
 node_modules/
 pnpm-lock.yaml
 Cargo.lock
+vendor/

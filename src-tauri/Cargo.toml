@@ -29,6 +29,9 @@ rusqlite = { version = "0.40.2", default-features = false, features = ["bundled"
 walkdir = "2.5.0"
 tauri-plugin-dialog = "2.8.1"
 
+[patch.crates-io]
+block = { path = "../vendor/block-0.1.6" }
+
 
 # Read the optimization guideline for more details: https://tauri.app/concept/size/#cargo-configuration
 [profile.release]

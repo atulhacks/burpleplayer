@@ -37,12 +37,12 @@ export function useSceneMotion(
     );
     if (!swing || !back || !middle || !front || !face || !eyes) return;
 
-    gsap.set(swing, { svgOrigin: "578 270" });
+    gsap.set(swing, { svgOrigin: "578 220" });
     gsap.set(eyes, { svgOrigin: "591 624" });
+    gsap.set(front, { x: 0 });
     const setSwing = gsap.quickSetter(swing, "rotation") as Setter;
     const setBack = gsap.quickSetter(back, "x") as Setter;
     const setMiddle = gsap.quickSetter(middle, "x") as Setter;
-    const setFront = gsap.quickSetter(front, "x") as Setter;
     const setFace = gsap.quickSetter(face, "y") as Setter;
     const setEyes = gsap.quickSetter(eyes, "scaleY") as Setter;
     const setCubes = cubes.map((cube) => gsap.quickSetter(cube, "y") as Setter);
@@ -50,6 +50,7 @@ export function useSceneMotion(
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
     let playback = usePlayerStore.getState().playback;
     let preference = useAppStore.getState().motionPreference;
+    let view = useAppStore.getState().view;
     let reduced =
       preference === "reduced" || (preference === "system" && media.matches);
     let bands = Array<number>(16).fill(0);
@@ -60,6 +61,7 @@ export function useSceneMotion(
     let velocity = 0;
     let kick = 0;
     let phase = 0;
+    let swingPhase = 0;
     let blinkAt = 3.4;
     let blinkLeft = 0;
     let attached = false;
@@ -80,7 +82,6 @@ export function useSceneMotion(
       setSwing(0);
       setBack(0);
       setMiddle(0);
-      setFront(0);
       setFace(0);
       setEyes(1);
       setCubes.forEach((setCube) => setCube(0));
@@ -100,19 +101,16 @@ export function useSceneMotion(
       bass += (targetBass - bass) * smoothing;
       kick *= Math.exp(-dt * 6);
 
-      // The spring loses energy naturally on pause; music only supplies a small drive.
-      const drive = playback.playing
-        ? Math.sin(phase * (1.15 + energy * 0.7)) *
-          (1.6 + energy * 4.2) *
-          playback.volume
-        : 0;
-      velocity += (-theta * 7.2 - velocity * 2.9 + drive) * dt;
-      theta = Math.max(-4.5, Math.min(4.5, theta + velocity * dt));
+      swingPhase += dt * (0.95 + energy * 0.25);
+      const amplitude =
+        2.8 + (playback.playing ? energy * playback.volume * 2.2 : 0);
+      const targetAngle = Math.sin(swingPhase) * amplitude;
+      velocity += ((targetAngle - theta) * 55 - velocity * 10) * dt;
+      theta = Math.max(-5.5, Math.min(5.5, theta + velocity * dt));
       setSwing(theta);
 
       setBack(Math.sin(phase * 0.22) * 8);
       setMiddle(Math.sin(phase * 0.33 + 1.2) * 13);
-      setFront(Math.sin(phase * 0.17 + 2.4) * 19);
 
       const playing = playback.playing;
       setFace(playing ? Math.sin(phase * 2.1) * (0.4 + energy * 1.5) : 0);
@@ -131,7 +129,7 @@ export function useSceneMotion(
     }
 
     function syncTicker() {
-      const shouldRun = !reduced && !document.hidden;
+      const shouldRun = !reduced && !document.hidden && view === "now-playing";
       if (shouldRun && !attached) {
         gsap.ticker.add(tick);
         attached = true;
@@ -155,6 +153,7 @@ export function useSceneMotion(
     });
     const unsubscribePreference = useAppStore.subscribe((state) => {
       preference = state.motionPreference;
+      view = state.view;
       reduced =
         preference === "reduced" || (preference === "system" && media.matches);
       syncTicker();
@@ -188,8 +187,7 @@ export function useSceneMotion(
             1,
             Math.round(((bands[index] ?? 0) / 255) * 13),
           );
-          bar.setAttribute("y", String(696 - height));
-          bar.setAttribute("height", String(height));
+          bar.style.transform = `scaleY(${height / 13})`;
         }
       }).then((cleanup) => {
         if (active) unlisten = cleanup;

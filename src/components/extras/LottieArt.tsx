@@ -83,15 +83,23 @@ function ShapeGraphic({ shape }: { shape: Shape }) {
 export function LottieArt({
   kind,
   loop = false,
+  paused = false,
   onComplete,
   className = "",
 }: {
   kind: LottieKind;
   loop?: boolean;
+  paused?: boolean;
   onComplete?: () => void;
   className?: string;
 }) {
   const svgRef = useRef<SVGSVGElement>(null);
+  const elapsedRef = useRef(0);
+  const kindRef = useRef(kind);
+  if (kindRef.current !== kind) {
+    kindRef.current = kind;
+    elapsedRef.current = 0;
+  }
   const onCompleteRef = useRef(onComplete);
   onCompleteRef.current = onComplete;
   const data = animations[kind];
@@ -104,7 +112,6 @@ export function LottieArt({
     );
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
     let preference = useAppStore.getState().motionPreference;
-    let elapsed = 0;
     let lastFrame = -1;
     let attached = false;
     let finished = false;
@@ -127,8 +134,8 @@ export function LottieArt({
     }
 
     function tick(_time: number, deltaTime: number) {
-      elapsed += Math.min(deltaTime / 1000, 0.05);
-      const raw = Math.floor(elapsed * data.fr);
+      elapsedRef.current += Math.min(deltaTime / 1000, 0.05);
+      const raw = Math.floor(elapsedRef.current * data.fr);
       const frame = loop ? raw % data.op : Math.min(data.op - 1, raw);
       draw(frame);
       if (!loop && raw >= data.op && !finished) {
@@ -142,7 +149,7 @@ export function LottieArt({
     function sync() {
       const reduced =
         preference === "reduced" || (preference === "system" && media.matches);
-      const shouldRun = !reduced && !document.hidden && !finished;
+      const shouldRun = !reduced && !paused && !document.hidden && !finished;
       if (shouldRun && !attached) {
         gsap.ticker.add(tick);
         attached = true;
@@ -164,7 +171,8 @@ export function LottieArt({
     });
     media.addEventListener("change", sync);
     document.addEventListener("visibilitychange", sync);
-    draw(0);
+    const initialFrame = Math.floor(elapsedRef.current * data.fr);
+    draw(loop ? initialFrame % data.op : Math.min(data.op - 1, initialFrame));
     sync();
     return () => {
       if (attached) gsap.ticker.remove(tick);
@@ -172,7 +180,7 @@ export function LottieArt({
       media.removeEventListener("change", sync);
       document.removeEventListener("visibilitychange", sync);
     };
-  }, [data, kind, loop]);
+  }, [data, kind, loop, paused]);
 
   return (
     <svg

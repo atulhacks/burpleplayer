@@ -4,7 +4,7 @@ A portrait desktop music player built with Tauri 2, Rust, React, TypeScript, Vit
 
 ## Status
 
-**Milestones 0–6 complete:** the clay playground is wired to the Rust audio engine, has its motion pass, and opens full Library, Queue, and Settings glass panels with a cloud-wipe transition. The console D-pad, A/B buttons, LCD, queue cubes, native music-folder picker, and compact Now Playing dock are interactive. Rust decodes and plays local music, owns the queue and persistent library, and emits playback and spectrum updates. Authored Lottie-format SVG animations and ASCII extras are now present. The accessibility/performance audit and final polish remain for later milestones.
+**Milestones 0–7 complete; milestone 8 pending:** the clay playground is wired to the Rust audio engine, has its motion pass, and opens full Library, Queue, and Settings glass panels with a cloud-wipe transition. The console D-pad, A/B buttons, LCD, queue cubes, native music-folder picker, and compact Now Playing dock are interactive. Rust decodes and plays local music, owns the queue and persistent library, and emits playback and spectrum updates. Authored Lottie-format SVG animations and ASCII extras are now present. Accessibility fixes and measured frame timings are in [`docs/accessibility-performance-audit.md`](docs/accessibility-performance-audit.md); the 60 fps target is not yet verified.
 
 ## Development
 
@@ -12,6 +12,7 @@ A portrait desktop music player built with Tauri 2, Rust, React, TypeScript, Vit
 pnpm install
 pnpm typecheck
 pnpm lint
+pnpm audit:contrast
 pnpm format:check
 pnpm build
 pnpm tauri dev
@@ -23,7 +24,7 @@ For a Rust-only check:
 cargo check --manifest-path src-tauri/Cargo.toml
 ```
 
-On the current macOS workstation, the Command Line Tools default to an SDK whose `.tbd` files this linker cannot parse. Until the toolchain is updated, prefix Rust/Tauri commands with `SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk`; this SDK was used for the milestone-0 Rust check, Clippy, and desktop smoke test. Other platforms should use their normal SDK selection.
+On the current macOS workstation, a debug app bundle built successfully with `SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk`. Other platforms should use their normal SDK selection.
 
 ## Architecture
 
@@ -64,4 +65,4 @@ The interface bundles [Fredoka](https://github.com/google/fonts/tree/main/ofl/fr
 
 ## Skill application plan
 
-The requested skill files were read before implementation. The `svg-animation` approach provides inline scalable vector art and live LCD spectrum bars. The `micro-interaction` approach informs console hit targets, press feedback, and slider spring release. The `gsap-web` approach supplies the single-ticker scene choreography and transition timeline. The `accessible-animation` approach supplies OS/in-app reduced-motion behavior. The `glassmorphism` approach supplies static, sparingly blurred Library/Queue/Settings panels. The `page-transition-animation` approach supplies an interruptible view swap behind a moving cloud layer. The `lottie-animation` approach supplies four original JSON shape animations and the `ascii-animation` approach supplies the LCD spectrum and scanning/empty art. The `60fps-animation` performance audit is scheduled for milestone 7.
+The requested skill files were read before implementation. The `svg-animation` approach provides inline scalable vector art and live LCD spectrum bars. The `micro-interaction` approach informs console hit targets, press feedback, and slider spring release. The `gsap-web` approach supplies the single-ticker scene choreography and transition timeline. The `accessible-animation` approach supplies OS/in-app reduced-motion behavior. The `glassmorphism` approach supplies static, sparingly blurred Library/Queue/Settings panels. The `page-transition-animation` approach supplies an interruptible view swap behind a moving cloud layer. The `lottie-animation` approach supplies four original JSON shape animations and the `ascii-animation` approach supplies the LCD spectrum and scanning/empty art. The `60fps-animation` and `accessible-animation` audit findings and measured results are recorded in [`docs/accessibility-performance-audit.md`](docs/accessibility-performance-audit.md).

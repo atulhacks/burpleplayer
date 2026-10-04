@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { EMPTY_LIBRARY_ART, scanAsciiFrame } from "../../lib/ascii";
 import { useAppStore } from "../../store/appStore";
@@ -15,6 +15,7 @@ export function EmptyLibraryAscii() {
 
 export function AsciiScanLoader() {
   const preRef = useRef<HTMLPreElement>(null);
+  const [paused, setPaused] = useState(false);
   useEffect(() => {
     const pre = preRef.current;
     if (!pre) return;
@@ -31,7 +32,7 @@ export function AsciiScanLoader() {
     const sync = () => {
       const reduced =
         preference === "reduced" || (preference === "system" && media.matches);
-      const shouldRun = !reduced && !document.hidden;
+      const shouldRun = !reduced && !paused && !document.hidden;
       if (shouldRun && !attached) {
         gsap.ticker.add(tick);
         attached = true;
@@ -54,15 +55,22 @@ export function AsciiScanLoader() {
       media.removeEventListener("change", sync);
       document.removeEventListener("visibilitychange", sync);
     };
-  }, []);
+  }, [paused]);
 
   return (
     <div className="ascii-scan" role="status" aria-live="polite">
-      <LottieArt kind="scanning" loop />
+      <LottieArt kind="scanning" loop paused={paused} />
       <pre ref={preRef} aria-hidden="true">
         {scanAsciiFrame(0)}
       </pre>
       <span>Scanning music folders…</span>
+      <button
+        type="button"
+        aria-pressed={paused}
+        onClick={() => setPaused((value) => !value)}
+      >
+        {paused ? "Resume motion" : "Pause motion"}
+      </button>
     </div>
   );
 }
