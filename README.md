@@ -1,76 +1,114 @@
-# BurplePlayer
+<p align="center">
+  <img src="src-tauri/icons/128x128@2x.png" width="112" height="112" alt="BurplePlayer app icon: a smiling pink handheld music player">
+</p>
 
-A portrait desktop music player built with Tauri 2, Rust, React, TypeScript, Vite, pnpm, and Zustand. The clay-toy swing image at [`design/reference.png`](design/reference.png) is the visual reference.
+<h1 align="center">BurplePlayer</h1>
 
-## Status
+<p align="center">
+  A local-first desktop music player inside a pastel, animated clay playground.
+</p>
 
-**Milestones 0–8 implemented:** the clay playground is wired to the Rust audio engine, has its motion pass, and opens full Library, Queue, and Settings glass panels with a cloud-wipe transition. The console D-pad, A/B buttons, LCD, queue cubes, native music-folder picker, and compact Now Playing dock are interactive. Rust decodes and plays local music, owns the queue and persistent library, and emits playback and spectrum updates. Authored Lottie-format SVG animations and ASCII extras are now present. Accessibility fixes and measured frame timings are in [`docs/accessibility-performance-audit.md`](docs/accessibility-performance-audit.md); the 60 fps target remains unverified on this host.
+<p align="center">
+  <strong>Tauri 2</strong> · <strong>Rust audio</strong> · <strong>React + TypeScript</strong> · <strong>SVG + GSAP</strong>
+</p>
+
+![Animated illustration of the BurplePlayer character on its swing](docs/swing-preview.svg)
+
+The scene is the interface: the pink console swings between two pillars, its LCD shows the current track and spectrum, and the little cubes on the ground represent the next songs in the queue. The visual direction comes from [`design/reference.png`](design/reference.png); the app itself is hand-built SVG and CSS, not a background image.
+
+## What works
+
+| Area          | Features                                                                                                                                   |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Playback      | Local MP3, FLAC, WAV, Ogg, and AAC decoding; play/pause, seek, volume, previous/next, queue jumping, OS media controls                     |
+| Library       | Native folder picker, recursive scans, tags and artwork, album/artist/folder browsing, search, SQLite persistence, playlists and Favorites |
+| Scene         | Live LCD face, track text and 16-band spectrum; a ring-anchored pendulum, drifting clouds, reactive queue cubes, day/twilight themes       |
+| Views         | Now Playing, Library, Queue, and Settings with an interruptible cloud-wipe transition and tinted glass panels                              |
+| Accessibility | Keyboard controls, visible focus, labeled controls, reduced-motion override, static animation fallbacks, contrast audit                    |
+
+The Rust backend owns audio, the queue, and the library. React sends typed Tauri commands and renders backend snapshots and events; it never reads audio files directly.
 
 ## Screenshots
 
-macOS release build, with the native titlebar cropped from the captures:
+macOS release build, with the native titlebar cropped:
 
-| Now Playing                                                                                                                             | Queue                                                                                                   |
-| --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| <img src="docs/screenshots/now-playing.jpg" alt="The clay console swinging between pastel pillars in the Now Playing view" width="320"> | <img src="docs/screenshots/queue.jpg" alt="The glass Queue panel over the clay playground" width="320"> |
+| Now Playing                                                                                                      | Queue                                                                                              |
+| ---------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| <img src="docs/screenshots/now-playing.jpg" alt="The console between pastel pillars in Now Playing" width="320"> | <img src="docs/screenshots/queue.jpg" alt="The glass Queue panel over the playground" width="320"> |
 
-## Development
+## Run locally
+
+Install Node.js, pnpm, Rust, and the platform prerequisites for [Tauri 2](https://v2.tauri.app/start/prerequisites/). On macOS, install the Xcode Command Line Tools. Then:
 
 ```sh
 pnpm install
-pnpm typecheck
-pnpm lint
-pnpm audit:contrast
-pnpm format:check
-pnpm build
 pnpm tauri dev
 ```
 
-For a Rust-only check:
+To build an installable desktop app:
 
 ```sh
-cargo check --manifest-path src-tauri/Cargo.toml
+pnpm tauri build
 ```
 
-On the current macOS workstation, the release `.app` and `.dmg` build with `SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk pnpm tauri build`. Other platforms should use their normal SDK selection.
-
-## Architecture
-
-- `src/components/scene/` — sky, clouds, pillars, swing, player, and queue cubes.
-- `src/components/controls/` — accessible Now Playing transport and seek/volume dock.
-- `src/components/panels/` — Library, Queue, and Settings glass views.
-- `src/components/extras/` — JSON-driven SVG animations and ASCII empty/scanning art.
-- `src/store/` — Zustand UI state plus a mirror of Rust's authoritative playback/library state.
-- `src/lib/` — typed Tauri IPC, event handling, and album-art palette extraction.
-- `src-tauri/src/audio/` — Rust playback, transport, queue, and spectrum.
-- `src-tauri/src/library/` — tags, artwork, SQLite, scans, and playlists.
-- `src-tauri/src/ipc/` — commands and event payloads.
-
-Rust is the source of truth for playback and library data. The frontend only sends commands and renders backend snapshots/events. The native Tauri dialog selects a folder; Rust scans it. `src-tauri/src/README.md` lists the command and event contract. The bundle identifier is now `com.burpleplayer.desktop`; first launch copies the previous `com.burpleplayer.app` SQLite library with `VACUUM INTO`, leaving the original intact.
-
-The scene in `src/components/scene/ClayScene.tsx` is layered SVG/CSS, not the reference image used as a background. The LCD draws live track text, time, face, and a 16-band spectrum. Up to six upcoming tracks appear as cubes; album art supplies their color when available. The hot spectrum path updates SVG bars through refs without rerendering React at 30 Hz.
-
-`src/components/scene/useSceneMotion.ts` owns one GSAP ticker callback for the scene: a gently continuous spring-driven swing that expands with volume and spectrum energy, staggered bass/kick cube hops, two drifting cloud layers and a static soft foreground, and a softly bobbing/blinking LCD face. The same spectrum listener feeds motion and LCD bars or a simple ASCII readout. Animation suspends when the document is hidden; OS reduced-motion and the app's `system`/`reduced`/`full` preference disable scene motion without stopping LCD updates. Button, D-pad, and slider feedback uses transform-only CSS transitions with a reduced-motion override.
-
-The persistent view switcher keeps the scene behind the tinted glass panels. Normal navigation runs an interruptible, 0.6-second GSAP cloud wipe while the pillars part; reduced motion uses a short fade. Library has song search, album/artist/folder browsing, playlists, and play/enqueue actions. Queue supports drag reorder and keyboard-operable move/remove buttons. Settings manages scanned folders, sunny/twilight themes, motion preference, and bar/ASCII LCD modes. UI preferences persist locally; Rust remains authoritative for tracks, playlists, and playback.
-
-The heart burst, import-success cubes, empty-library console, and scanning cloud are original Bodymovin/Lottie-format shape animations under `src/assets/lottie/`, generated by `scripts/generate-lottie.mjs`. A small SVG renderer in `src/components/extras/LottieArt.tsx` plays this authored shape subset through the shared GSAP ticker; no external artwork or Lottie runtime is required. ASCII extras include a 20-column, six-row LCD spectrum, a four-frame folder-scan loader, and empty-state console art. All extras stop animating when the window is hidden and show static frames under reduced motion.
+The macOS bundle appears at `src-tauri/target/release/bundle/macos/BurplePlayer.app`; the DMG appears under `src-tauri/target/release/bundle/dmg/`. On the workstation used for this project, the macOS 26.5 SDK can be selected explicitly with `SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk pnpm tauri build`.
 
 ## Controls
 
-- Console D-pad: left/right skip tracks; up/down change volume.
-- Console A: play/pause (or choose a folder when the library is empty).
-- Console B: open the Queue drawer; click an upcoming cube to jump to that song.
-- Keyboard: Space, arrow keys, Tab/Enter, and Escape for the Queue drawer.
-- The compact dock can expand to reveal seek and volume sliders. The `+ Music` button adds another folder.
-- The heart in the compact dock toggles the current song in a persistent Favorites playlist; adding a favorite plays the burst. A successful folder import shows a dismissible cube celebration.
-- The four navigation buttons open Play, Library, Queue, and Settings. In Library, search and browse songs, albums, artists, folders, or playlists. Add a song to the queue with `+`, or select a playlist from its row.
-- In Queue, drag a row or use its ↑/↓ buttons to reorder it. In Settings, rescan/remove library folders and choose theme, motion, or LCD mode.
+| Control           | Action                                                             |
+| ----------------- | ------------------------------------------------------------------ |
+| D-pad left/right  | Previous/next track                                                |
+| D-pad up/down     | Volume up/down                                                     |
+| A button or Space | Play/pause; open the music-folder picker when the library is empty |
+| B button          | Open Queue                                                         |
+| Queue cube        | Jump to that upcoming song                                         |
+| Heart in the dock | Add/remove the current track from Favorites                        |
+| Tab / Enter       | Move through and activate controls                                 |
+| Escape            | Return to Now Playing from a panel                                 |
 
-## Bundled fonts
+The dock expands to show seek and volume sliders. Library supports song search, album/artist/folder browsing, playlists, and enqueue actions; Queue supports drag reordering and keyboard move/remove buttons. Settings manages folders, theme, motion, and bar/ASCII visualizer modes.
 
-The interface bundles [Fredoka](https://github.com/google/fonts/tree/main/ofl/fredoka) and [Press Start 2P](https://github.com/google/fonts/tree/main/ofl/pressstart2p) locally under `src/assets/fonts/`. Both are distributed under their included SIL Open Font License files; no font CDN is used.
+## Project map
 
-## Skill application plan
+| Path                       | Responsibility                                                                     |
+| -------------------------- | ---------------------------------------------------------------------------------- |
+| `src/components/scene/`    | Sky, clouds, pillars, rings, ropes, character, cubes, and shared GSAP scene motion |
+| `src/components/controls/` | Now Playing transport, seek, volume, and Favorites                                 |
+| `src/components/panels/`   | Library, Queue, and Settings glass views                                           |
+| `src/components/extras/`   | Authored Lottie-format SVG shapes and ASCII art                                    |
+| `src/store/`               | Zustand UI preferences and mirrors of backend playback/library state               |
+| `src/lib/`                 | Typed IPC, event handling, album-art palette extraction, opt-in frame probe        |
+| `src-tauri/src/audio/`     | Symphonia decoding, Rodio output, queue, spectrum, media controls                  |
+| `src-tauri/src/library/`   | Lofty tags/artwork, WalkDir scanning, SQLite library and playlists                 |
+| `src-tauri/src/ipc/`       | Tauri commands and event payloads                                                  |
 
-The requested skill files were read before implementation. The `svg-animation` approach provides inline scalable vector art and live LCD spectrum bars. The `micro-interaction` approach informs console hit targets, press feedback, and slider spring release. The `gsap-web` approach supplies the single-ticker scene choreography and transition timeline. The `accessible-animation` approach supplies OS/in-app reduced-motion behavior. The `glassmorphism` approach supplies static, sparingly blurred Library/Queue/Settings panels. The `page-transition-animation` approach supplies an interruptible view swap behind a moving cloud layer. The `lottie-animation` approach supplies four original JSON shape animations and the `ascii-animation` approach supplies the LCD spectrum and scanning/empty art. The `60fps-animation` and `accessible-animation` audit findings and measured results are recorded in [`docs/accessibility-performance-audit.md`](docs/accessibility-performance-audit.md).
+The bundle identifier is `com.burpleplayer.desktop`. On first launch, an existing `com.burpleplayer.app` SQLite library is copied into the new app-data location without changing the old database. [`src-tauri/src/README.md`](src-tauri/src/README.md) documents the command and event contract.
+
+## Motion and accessibility
+
+The main scene uses a single GSAP ticker. Both ropes pivot from fixed SVG rings while the console follows their arc with a small counter-tilt; spectrum energy and volume influence the swing, and bass/kicks lift the queue cubes. Two cloud layers drift independently; the foreground blur stays still to avoid repainting a large filtered region. The LCD spectrum updates SVG bar transforms through refs at roughly 30 Hz without a React rerender per event.
+
+The heart burst, import-success cubes, empty-library console, and scanning cloud are original Lottie-format JSON shapes in `src/assets/lottie/`, generated by `scripts/generate-lottie.mjs` and rendered with the shared ticker. ASCII mode provides a 20-column LCD spectrum and scanning/empty art. The swing preview above is a self-contained animated SVG with a still state under `prefers-reduced-motion`.
+
+Scene motion stops when the window is hidden, a glass panel is open, or reduced motion is selected. The LCD remains live in reduced mode. Keyboard and contrast findings are recorded in [`docs/accessibility-performance-audit.md`](docs/accessibility-performance-audit.md).
+
+## Checks and current performance result
+
+```sh
+pnpm typecheck
+pnpm lint
+pnpm format:check
+pnpm audit:contrast
+pnpm build
+cargo test --manifest-path src-tauri/Cargo.toml
+```
+
+The current audit measured an opt-in **release** build on an Apple M4 with a 60 Hz display. Both GSAP and raw `requestAnimationFrame` ran at about **30 Hz**, including while the scene was visually hidden; one transition reached roughly 130 ms. The requested steady 60 fps / zero-dropped-transition-frame target is therefore **not met in that measured run**. The evidence, limits of the measurement, and reproduction steps are in the [audit report](docs/accessibility-performance-audit.md). The regular app build does not contain the extra audit rAF loop.
+
+## Fonts and design assets
+
+[Fredoka](https://github.com/google/fonts/tree/main/ofl/fredoka) and [Press Start 2P](https://github.com/google/fonts/tree/main/ofl/pressstart2p) are bundled locally under `src/assets/fonts/` with their SIL Open Font License files. The app icon is in `src-tauri/icons/`, and the README swing illustration is [`docs/swing-preview.svg`](docs/swing-preview.svg).
+
+## Skill application
+
+The requested skill set is reflected in the shipped code: `svg-animation` in the scalable character, anchored rope/ring motion, LCD, and README preview; `gsap-web` in the shared scene ticker and view timeline; `micro-interaction` in console and dock press/slider feedback; `page-transition-animation` in the cloud wipe; `glassmorphism` in the static tinted panels; `lottie-animation` in the authored JSON shape effects; `ascii-animation` in LCD and scanning art; and `accessible-animation` plus `60fps-animation` in reduced-motion, focus, contrast, and performance audit work.

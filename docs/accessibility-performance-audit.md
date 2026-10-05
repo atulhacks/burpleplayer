@@ -38,12 +38,13 @@ possible pixel under translucent surfaces.
 
 ## Frame-timing measurements
 
-An opt-in `VITE_PERF_AUDIT=1` build uses `src/lib/performanceProbe.ts` to sample
-the shared GSAP ticker after the document is focused. It records three seconds
-of steady Play view, then four view changes over four seconds. Values are stored
-as `burple.perf-audit` in the app's local storage. The test used a debug macOS
-app bundle on an Apple M4 with 16 GB RAM, two library tracks, and no audio
-playing. These are ticker intervals, **not** a browser paint/composite trace.
+The initial opt-in `VITE_PERF_AUDIT=1` probe sampled the shared GSAP ticker
+after the document was focused. It recorded three seconds of steady Play view
+and four view changes over four seconds in a debug macOS app bundle on an Apple
+M4 with 16 GB RAM, two library tracks, and no audio playing. These are ticker
+intervals, **not** a browser paint/composite trace. The current probe source is
+`src/lib/performanceProbe.ts`; it writes `burple.perf-audit` to the app's local
+storage.
 
 | Mode                      | Window                | Frames | Mean interval |   p95 |    Max | Frames over 34 ms |
 | ------------------------- | --------------------- | -----: | ------------: | ----: | -----: | ----------------: |
@@ -54,12 +55,40 @@ playing. These are ticker intervals, **not** a browser paint/composite trace.
 | Reduced motion            | Steady, 3 s           |     90 |       33.3 ms | 34 ms |  35 ms |                 4 |
 | Reduced motion            | Four transitions, 4 s |    118 |       33.9 ms | 56 ms |  73 ms |                13 |
 
-The observed environment does **not** meet the requested steady 60 fps or
-zero-dropped-transition-frame target. A near-30 Hz ceiling remained even after
-scene motion was disabled, so this measurement cannot isolate application cost
-from the host display/compositor cadence. The cloud-filter fix brought the
-full-motion steady ticker up to the same observed ~30 Hz cadence, but
-transition outliers remain. A foreground 60 Hz or higher display with WebKit frame profiling
-and a release bundle is required before the 60 fps acceptance criterion can be
-claimed. The source-level fixes above reduce avoidable paint and hidden work,
-but are not presented as proof of that target.
+### Focused release-bundle diagnostic
+
+The audit was repeated with an opt-in **release** app bundle on the same Apple
+M4, with the native window focused throughout. This version of the probe sampled
+both the GSAP ticker and an independent `requestAnimationFrame` clock. The
+report was recorded at 2026-10-04 13:44:31 UTC, before the later swing-anchor
+change in commit `1b596d9`. The
+physical display reported 1470 × 956 at **60 Hz** through CoreGraphics; the
+WebKit screen reported the same size at device-pixel ratio 2. The stage-hidden
+phase set `.scene-frame` to `visibility: hidden`, but kept the rest of the UI and
+the scene's ticker alive. The extra rAF loop exists only in the opt-in audit
+build; it is not part of a normal release.
+
+To repeat the diagnostic, run `VITE_PERF_AUDIT=1 pnpm tauri build --bundles app`,
+open that bundle, and keep its window focused for at least 13 seconds.
+`python3 scripts/read-perf-audit.py` prints the latest saved report,
+including a per-view transition breakdown in current probe builds. Rebuild
+without `VITE_PERF_AUDIT` afterward to restore the normal release bundle.
+
+| Clock       | Phase                 | Frames | Mean interval |   p95 |    Max | Frames over 25 ms |
+| ----------- | --------------------- | -----: | ------------: | ----: | -----: | ----------------: |
+| GSAP ticker | Steady scene, 3 s     |     90 |       33.3 ms | 35 ms |  35 ms |                90 |
+| Raw rAF     | Steady scene, 3 s     |     90 |       33.3 ms | 35 ms |  35 ms |                90 |
+| GSAP ticker | Stage hidden, 1.6 s   |     48 |       33.3 ms | 34 ms |  35 ms |                48 |
+| Raw rAF     | Stage hidden, 1.6 s   |     48 |       33.3 ms | 34 ms |  34 ms |                48 |
+| GSAP ticker | Four transitions, 4 s |    117 |       34.2 ms | 35 ms | 129 ms |               116 |
+| Raw rAF     | Four transitions, 4 s |    117 |       34.2 ms | 35 ms | 130 ms |               116 |
+
+The requested steady **60 fps** and zero-dropped-transition-frame budget is
+**not met in this measured run**. Because raw rAF and GSAP share the same ~30 Hz
+cadence even with the scene visually hidden, this result does not support
+blaming the SVG scene or GSAP for the steady-state ceiling. It also does not
+prove a general WKWebView cap: the test did not isolate every remaining DOM
+layer, OS scheduling policy, or the capture environment. The 129–130 ms
+transition outlier is a separate, observable hitch that still needs profiling.
+The cloud-filter fix reduced avoidable paint work, but its previous ~30 Hz
+result was a host cadence rather than proof of 60 fps.

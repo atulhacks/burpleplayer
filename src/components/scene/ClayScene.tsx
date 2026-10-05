@@ -1000,7 +1000,9 @@ export function ClayScene() {
           <Rope x={433} top={270} />
           <Rope x={723} top={291} />
           <g data-swing-player>
-            <Player bars={bars} ascii={ascii} />
+            <g data-swing-body>
+              <Player bars={bars} ascii={ascii} />
+            </g>
           </g>
           <SwingRing x={433} top={270} />
           <SwingRing x={723} top={291} />

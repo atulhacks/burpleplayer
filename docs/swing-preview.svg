@@ -1,0 +1,138 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 360" role="img" aria-labelledby="title description">
+  <title id="title">BurplePlayer on a swing</title>
+  <desc id="description">A pink pixel-faced music player gently swings from two fixed silver rings between pastel pillars.</desc>
+  <defs>
+    <linearGradient id="sky" x2="0" y2="1">
+      <stop stop-color="#55b9f0"/>
+      <stop offset="1" stop-color="#cceaf8"/>
+    </linearGradient>
+    <linearGradient id="sand" x2="0" y2="1">
+      <stop stop-color="#ffe6b6"/>
+      <stop offset="1" stop-color="#efbd86"/>
+    </linearGradient>
+    <linearGradient id="lavender" x2="1" y2=".35">
+      <stop stop-color="#ba94ee"/>
+      <stop offset="1" stop-color="#8660d4"/>
+    </linearGradient>
+    <linearGradient id="coral" x2="1" y2=".35">
+      <stop stop-color="#f5a0b5"/>
+      <stop offset="1" stop-color="#e96087"/>
+    </linearGradient>
+    <linearGradient id="bar" x2="0" y2="1">
+      <stop stop-color="#fa91a2"/>
+      <stop offset="1" stop-color="#df4d6f"/>
+    </linearGradient>
+    <linearGradient id="shell" x2="1" y2="1">
+      <stop stop-color="#ffd0b6"/>
+      <stop offset=".55" stop-color="#f7a28f"/>
+      <stop offset="1" stop-color="#e9837c"/>
+    </linearGradient>
+    <linearGradient id="screen" x2="0" y2="1">
+      <stop stop-color="#78d9f8"/>
+      <stop offset="1" stop-color="#43b5e7"/>
+    </linearGradient>
+    <linearGradient id="metal" x2="1" y2="0">
+      <stop stop-color="#707788"/>
+      <stop offset=".38" stop-color="#e9eef0"/>
+      <stop offset="1" stop-color="#9ea7ae"/>
+    </linearGradient>
+    <filter id="soft-shadow" x="-30%" y="-35%" width="160%" height="180%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+  </defs>
+  <style>
+    .moving { transform-box: view-box; }
+    .rope-left { transform-origin: 382px 123px; }
+    .rope-right { transform-origin: 578px 123px; }
+    .rider { transform-origin: 480px 235px; }
+    .cloud-left, .cloud-right { transform-box: view-box; }
+    @media (prefers-reduced-motion: no-preference) {
+      .rope-left, .rope-right { animation: pendulum 4.4s ease-in-out infinite; }
+      .rider { animation: ride 4.4s ease-in-out infinite; }
+      .cloud-left { animation: drift-left 13s ease-in-out infinite alternate; }
+      .cloud-right { animation: drift-right 16s ease-in-out infinite alternate; }
+      .screen-sheen { animation: sheen 4.4s ease-in-out infinite; }
+    }
+    @keyframes pendulum {
+      0%, 100% { transform: rotate(-6deg); }
+      50% { transform: rotate(6deg); }
+    }
+    @keyframes ride {
+      0%, 100% { transform: translate(15px, -1px) rotate(-.8deg); }
+      50% { transform: translate(-15px, -1px) rotate(.8deg); }
+    }
+    @keyframes drift-left {
+      to { transform: translateX(17px); }
+    }
+    @keyframes drift-right {
+      to { transform: translateX(-13px); }
+    }
+    @keyframes sheen {
+      0%, 68%, 100% { opacity: .13; }
+      78% { opacity: .34; }
+    }
+  </style>
+
+  <rect width="960" height="360" rx="26" fill="url(#sky)"/>
+  <path d="M0 308Q470 294 960 308V360H0Z" fill="url(#sand)"/>
+  <ellipse cx="480" cy="320" rx="128" ry="14" fill="#866591" opacity=".18" filter="url(#soft-shadow)"/>
+
+  <g class="cloud-left moving" fill="#fff9f5">
+    <circle cx="59" cy="113" r="35"/><circle cx="99" cy="93" r="47"/>
+    <circle cx="145" cy="111" r="34"/><ellipse cx="100" cy="128" rx="94" ry="28"/>
+  </g>
+  <g class="cloud-right moving" fill="#fff9f5">
+    <circle cx="819" cy="181" r="31"/><circle cx="860" cy="158" r="48"/>
+    <circle cx="910" cy="180" r="35"/><ellipse cx="867" cy="197" rx="89" ry="27"/>
+  </g>
+
+  <rect x="157" y="39" width="77" height="277" rx="19" fill="url(#lavender)"/>
+  <path d="M172 51v245" stroke="#e8cdfb" stroke-width="8" opacity=".32" stroke-linecap="round"/>
+  <rect x="157" y="185" width="77" height="34" rx="10" fill="#a8e47d"/>
+  <rect x="726" y="39" width="77" height="277" rx="19" fill="url(#coral)"/>
+  <path d="M741 51v245" stroke="#ffd0d5" stroke-width="8" opacity=".34" stroke-linecap="round"/>
+  <rect x="726" y="185" width="77" height="34" rx="10" fill="#a8e47d"/>
+  <rect x="211" y="79" width="538" height="35" rx="16" fill="url(#bar)"/>
+  <path d="M228 86h502" stroke="#ffd0c9" stroke-width="5" opacity=".46" stroke-linecap="round"/>
+
+  <g class="rope-left moving">
+    <path d="M382 123v143" stroke="#798493" stroke-width="9" stroke-linecap="round"/>
+    <path d="M380 123v143" stroke="#dbe0df" stroke-width="5" stroke-linecap="round"/>
+    <path d="M378 146l7-6m-7 20 7-6m-7 20 7-6m-7 20 7-6m-7 20 7-6m-7 20 7-6m-7 20 7-6" stroke="#858e95" stroke-width="1.5" opacity=".67"/>
+  </g>
+  <g class="rope-right moving">
+    <path d="M578 123v143" stroke="#798493" stroke-width="9" stroke-linecap="round"/>
+    <path d="M576 123v143" stroke="#dbe0df" stroke-width="5" stroke-linecap="round"/>
+    <path d="M574 146l7-6m-7 20 7-6m-7 20 7-6m-7 20 7-6m-7 20 7-6m-7 20 7-6m-7 20 7-6" stroke="#858e95" stroke-width="1.5" opacity=".67"/>
+  </g>
+
+  <g class="rider moving">
+    <path d="M411 222q-22 1-31 25l-8 31h30l17-37Z" fill="#f4a044"/>
+    <path d="M549 222q22 1 31 25l8 31h-30l-17-37Z" fill="#f4a044"/>
+    <circle cx="382" cy="243" r="17" fill="#772b79"/>
+    <circle cx="578" cy="243" r="17" fill="#772b79"/>
+    <rect x="402" y="146" width="156" height="149" rx="23" fill="url(#shell)" stroke="#d9787c" stroke-width="3"/>
+    <path d="M416 155h126" stroke="#ffe4ca" stroke-width="6" opacity=".75" stroke-linecap="round"/>
+    <rect x="422" y="164" width="116" height="91" rx="12" fill="#563871"/>
+    <rect x="432" y="174" width="96" height="71" rx="4" fill="url(#screen)"/>
+    <path class="screen-sheen" d="M436 177h88v9h-88Z" fill="#fff" opacity=".13"/>
+    <path d="M451 198h8v7h4v12h-4v5h-8v-5h-4v-12h4Zm47 0h8v7h4v12h-4v5h-8v-5h-4v-12h4Z" fill="#342459"/>
+    <path d="M464 226h32v5h-5v5h-22v-5h-5Z" fill="#342459"/>
+    <path d="M437 267h10v9h9v10h-9v9h-10v-9h-9v-10h9Z" fill="#402957"/>
+    <circle cx="504" cy="280" r="8" fill="#8d2c80"/>
+    <circle cx="528" cy="273" r="8" fill="#8d2c80"/>
+    <path d="M428 291v21h44v-18m16-3v21h44v-18" fill="none" stroke="#efaa8a" stroke-width="17" stroke-linecap="round"/>
+    <rect x="422" y="303" width="54" height="31" rx="10" fill="#782673"/>
+    <rect x="484" y="303" width="54" height="31" rx="10" fill="#782673"/>
+    <path d="M433 310h32m30 0h32" stroke="#ab4a9d" stroke-width="3" opacity=".6" stroke-linecap="round"/>
+  </g>
+
+  <g fill="none" stroke="url(#metal)" stroke-width="12">
+    <ellipse cx="382" cy="96" rx="17" ry="29"/>
+    <ellipse cx="578" cy="96" rx="17" ry="29"/>
+  </g>
+  <g fill="none" stroke="#f3f4ed" stroke-width="3" opacity=".72">
+    <path d="M370 80q-10 18 1 35"/>
+    <path d="M566 80q-10 18 1 35"/>
+  </g>
+</svg>

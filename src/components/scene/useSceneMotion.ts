@@ -28,6 +28,7 @@ export function useSceneMotion(
       '[data-swing-rope="723"]',
     );
     const player = stage.querySelector<SVGGElement>("[data-swing-player]");
+    const body = stage.querySelector<SVGGElement>("[data-swing-body]");
     const back = stage.querySelector<SVGGElement>(
       '[data-scene-layer="clouds-back"]',
     );
@@ -47,6 +48,7 @@ export function useSceneMotion(
       !leftRope ||
       !rightRope ||
       !player ||
+      !body ||
       !back ||
       !middle ||
       !front ||
@@ -57,12 +59,14 @@ export function useSceneMotion(
 
     gsap.set(leftRope, { svgOrigin: "433 260" });
     gsap.set(rightRope, { svgOrigin: "723 281" });
+    gsap.set(body, { svgOrigin: "578 710" });
     gsap.set(eyes, { svgOrigin: "591 624" });
     gsap.set(front, { x: 0 });
     const setLeftRope = gsap.quickSetter(leftRope, "rotation") as Setter;
     const setRightRope = gsap.quickSetter(rightRope, "rotation") as Setter;
     const setPlayerX = gsap.quickSetter(player, "x") as Setter;
     const setPlayerY = gsap.quickSetter(player, "y") as Setter;
+    const setBodyTilt = gsap.quickSetter(body, "rotation") as Setter;
     const setBack = gsap.quickSetter(back, "x") as Setter;
     const setMiddle = gsap.quickSetter(middle, "x") as Setter;
     const setFace = gsap.quickSetter(face, "y") as Setter;
@@ -105,6 +109,7 @@ export function useSceneMotion(
       setRightRope(0);
       setPlayerX(0);
       setPlayerY(0);
+      setBodyTilt(0);
       setBack(0);
       setMiddle(0);
       setFace(0);
@@ -137,6 +142,9 @@ export function useSceneMotion(
       const radians = (theta * Math.PI) / 180;
       setPlayerX(-610 * Math.sin(radians));
       setPlayerY(610 * (Math.cos(radians) - 1));
+      setBodyTilt(
+        Math.max(-1.5, Math.min(1.5, -theta * 0.16 - velocity * 0.02)),
+      );
 
       setBack(Math.sin(phase * 0.22) * 8);
       setMiddle(Math.sin(phase * 0.33 + 1.2) * 13);
@@ -237,6 +245,7 @@ export function useSceneMotion(
           leftRope,
           rightRope,
           player,
+          body,
           back,
           middle,
           front,
