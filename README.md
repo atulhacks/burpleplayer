@@ -16,6 +16,20 @@
 
 The scene is the interface: the pink console swings between two pillars, its LCD shows the current track and spectrum, and the little cubes on the ground represent the next songs in the queue. The visual direction comes from [`design/reference.png`](design/reference.png); the app itself is hand-built SVG and CSS, not a background image.
 
+## Download
+
+Get installers from [GitHub Releases](https://github.com/atulhacks/burpleplayer/releases):
+
+| System                             | Download               |
+| ---------------------------------- | ---------------------- |
+| macOS Apple Silicon (M1 and newer) | `aarch64.dmg`          |
+| macOS Intel                        | `x64.dmg`              |
+| Windows x64                        | `_setup.exe` or `.msi` |
+| Ubuntu x64                         | `.deb`                 |
+| Other x64 Linux distributions      | `.AppImage`            |
+
+The [desktop release workflow](.github/workflows/release.yml) builds each architecture on a native GitHub runner. A pushed `v*` tag creates a draft release and publishes it only when every platform build succeeds; a manual workflow run builds test artifacts without creating a public release. The macOS bundles are ad-hoc signed, not notarized; Windows installers are unsigned.
+
 ## What works
 
 | Area          | Features                                                                                                                                   |
