@@ -71,10 +71,8 @@ jobs:
         with:
           node-version: 24
 
-      - uses: pnpm/action-setup@v6.1.0
-        with:
-          version: 11.19.0
-          cache: true
+      - name: Install pinned pnpm
+        run: npm install --global pnpm@11.19.0
 
       - name: Verify release tag matches app version
         if: github.event_name == 'push' || inputs.release_tag != ''
