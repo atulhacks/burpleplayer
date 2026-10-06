@@ -52,7 +52,7 @@ macOS release build, with the native titlebar cropped:
 
 ## Run locally
 
-Install Node.js, pnpm, Rust, and the platform prerequisites for [Tauri 2](https://v2.tauri.app/start/prerequisites/). On macOS, install the Xcode Command Line Tools. Then:
+Install Node.js 24 or newer, pnpm, Rust, and the platform prerequisites for [Tauri 2](https://v2.tauri.app/start/prerequisites/). On macOS, install the Xcode Command Line Tools. Then:
 
 ```sh
 pnpm install
