@@ -2,6 +2,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import { cubeColorForTrack, fallbackCubeColor } from "../../lib/artPalette";
 import { LCD_ASCII_ROWS } from "../../lib/ascii";
+import {
+  armBoneMatrix,
+  swingArmBones,
+  SWING_GRIPS,
+} from "../../lib/swingGeometry";
 import type { Track } from "../../lib/playerApi";
 import { useAppStore } from "../../store/appStore";
 import { usePlayerStore } from "../../store/playerStore";
@@ -304,6 +309,93 @@ function Rope({ x, top }: { x: number; top: number }) {
   );
 }
 
+function SwingArms() {
+  return (
+    <g aria-hidden="true">
+      {swingArmBones(0, 0).map((bone, index) => (
+        <g
+          key={index}
+          data-arm-bone={index}
+          style={{ transform: armBoneMatrix(bone), transformOrigin: "0 0" }}
+        >
+          <path
+            d="M0 0V100"
+            fill="none"
+            stroke="var(--arm-shadow)"
+            strokeWidth="33"
+            strokeLinecap="round"
+          />
+          <path
+            d="M0 0V100"
+            fill="none"
+            stroke="url(#arm-gradient)"
+            strokeWidth="28"
+            strokeLinecap="round"
+          />
+          <path
+            d="M-6 5V95"
+            fill="none"
+            stroke="var(--arm-highlight)"
+            strokeWidth="4"
+            strokeLinecap="round"
+            opacity="0.45"
+          />
+        </g>
+      ))}
+    </g>
+  );
+}
+
+function RopeGrip({ side }: { side: keyof typeof SWING_GRIPS }) {
+  const { x, gripY: y } = SWING_GRIPS[side];
+  const direction = side === "left" ? 1 : -1;
+  return (
+    <g data-swing-grip={x} aria-hidden="true">
+      <g transform={`translate(${x} ${y}) scale(${direction} 1)`}>
+        <rect
+          x="-17"
+          y="19"
+          width="34"
+          height="15"
+          rx="7"
+          fill="var(--glove-outline)"
+        />
+        <path
+          d="M-19-26q-18 1-18 24v11q0 20 20 24h24q19-4 20-24v-17q-2-22-21-23Z"
+          fill="url(#glove-gradient)"
+          stroke="var(--glove-outline)"
+          strokeWidth="3"
+        />
+        <path
+          d="M-17-23q-12 2-13 15"
+          fill="none"
+          stroke="var(--glove-highlight)"
+          strokeWidth="5"
+          strokeLinecap="round"
+          opacity="0.65"
+        />
+        {[-12, 0, 12].map((fingerY) => (
+          <path
+            key={fingerY}
+            d={`M-5 ${fingerY}q14-5 26 0`}
+            fill="none"
+            stroke="var(--glove-outline)"
+            strokeWidth="3"
+            strokeLinecap="round"
+            opacity="0.58"
+          />
+        ))}
+        <path
+          d="M-17 10q-7-12 0-19q6-4 13 4l9 13q3 9-5 13q-10 4-17-11Z"
+          fill="url(#glove-gradient)"
+          stroke="var(--glove-outline)"
+          strokeWidth="3"
+        />
+      </g>
+    </g>
+  );
+}
+
 function SwingRing({
   x,
   top,
@@ -538,18 +630,6 @@ function Player({
   return (
     <g className="player" aria-hidden="true">
       <path
-        d="M408 688q-9 13-5 40l12 31q9 12 24 7l15-8-17-66Z"
-        fill="url(#arm-gradient)"
-        stroke="var(--arm-shadow)"
-        strokeWidth="2"
-      />
-      <path
-        d="M731 685q17 14 13 43l-14 29q-8 13-24 6l-13-8 19-67Z"
-        fill="url(#arm-gradient)"
-        stroke="var(--arm-shadow)"
-        strokeWidth="2"
-      />
-      <path
         d="M423 853q-12 4-13 25v21h57v-17q-2-24-19-29Z"
         fill="url(#shell-gradient)"
       />
@@ -747,53 +827,6 @@ function Player({
         stroke="var(--boot-outline)"
         strokeWidth="4"
         opacity="0.4"
-      />
-
-      <path
-        d="M431 646q17-3 26 16l-2 27q-5 18-23 26l-12-9q-11-28-2-47Z"
-        fill="url(#glove-gradient)"
-        stroke="var(--glove-outline)"
-        strokeWidth="3"
-      />
-      <ellipse
-        cx="417"
-        cy="671"
-        rx="27"
-        ry="33"
-        fill="url(#glove-gradient)"
-        stroke="var(--glove-outline)"
-        strokeWidth="3"
-      />
-      <path
-        d="M438 643q16 9 13 29"
-        fill="none"
-        stroke="var(--glove-highlight)"
-        strokeWidth="5"
-        opacity="0.6"
-        strokeLinecap="round"
-      />
-      <path
-        d="M706 648q20-4 29 14l6 29q-4 19-22 24l-13-9q-13-23-8-42Z"
-        fill="url(#glove-gradient)"
-        stroke="var(--glove-outline)"
-        strokeWidth="3"
-      />
-      <ellipse
-        cx="739"
-        cy="676"
-        rx="23"
-        ry="32"
-        fill="url(#glove-gradient)"
-        stroke="var(--glove-outline)"
-        strokeWidth="3"
-      />
-      <path
-        d="M726 651q-13 9-11 24"
-        fill="none"
-        stroke="var(--glove-highlight)"
-        strokeWidth="5"
-        opacity="0.55"
-        strokeLinecap="round"
       />
     </g>
   );
@@ -1031,11 +1064,14 @@ export function ClayScene() {
         <g data-scene-layer="swing">
           <Rope x={433} top={270} />
           <Rope x={723} top={291} />
+          <SwingArms />
           <g data-swing-player>
             <g data-swing-body>
               <Player bars={bars} ascii={ascii} />
             </g>
           </g>
+          <RopeGrip side="left" />
+          <RopeGrip side="right" />
           <SwingRing x={433} top={270} />
           <SwingRing x={723} top={291} />
         </g>

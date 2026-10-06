@@ -7,6 +7,8 @@ import { PAUSED_LCD_ASCII, spectrumAsciiRows } from "../../lib/ascii";
 import { useAppStore } from "../../store/appStore";
 import { usePlayerStore } from "../../store/playerStore";
 
+import { armBoneMatrix, swingArmBones } from "../../lib/swingGeometry";
+
 type Setter = (value: number) => void;
 
 export function useSceneMotion(
@@ -26,6 +28,15 @@ export function useSceneMotion(
     );
     const rightRope = stage.querySelector<SVGGElement>(
       '[data-swing-rope="723"]',
+    );
+    const leftGrip = stage.querySelector<SVGGElement>(
+      '[data-swing-grip="433"]',
+    );
+    const rightGrip = stage.querySelector<SVGGElement>(
+      '[data-swing-grip="723"]',
+    );
+    const armBones = Array.from(
+      stage.querySelectorAll<SVGGElement>("[data-arm-bone]"),
     );
     const player = stage.querySelector<SVGGElement>("[data-swing-player]");
     const body = stage.querySelector<SVGGElement>("[data-swing-body]");
@@ -47,6 +58,9 @@ export function useSceneMotion(
       !swing ||
       !leftRope ||
       !rightRope ||
+      !leftGrip ||
+      !rightGrip ||
+      armBones.length !== 4 ||
       !player ||
       !body ||
       !back ||
@@ -57,13 +71,19 @@ export function useSceneMotion(
     )
       return;
 
-    gsap.set(leftRope, { svgOrigin: "433 260" });
-    gsap.set(rightRope, { svgOrigin: "723 281" });
+    gsap.set([leftRope, leftGrip], { svgOrigin: "433 260" });
+    gsap.set([rightRope, rightGrip], { svgOrigin: "723 281" });
     gsap.set(body, { svgOrigin: "578 710" });
     gsap.set(eyes, { svgOrigin: "591 624" });
     gsap.set(front, { x: 0 });
-    const setLeftRope = gsap.quickSetter(leftRope, "rotation") as Setter;
-    const setRightRope = gsap.quickSetter(rightRope, "rotation") as Setter;
+    const setLeftRope = gsap.quickSetter(
+      [leftRope, leftGrip],
+      "rotation",
+    ) as Setter;
+    const setRightRope = gsap.quickSetter(
+      [rightRope, rightGrip],
+      "rotation",
+    ) as Setter;
     const setPlayerX = gsap.quickSetter(player, "x") as Setter;
     const setPlayerY = gsap.quickSetter(player, "y") as Setter;
     const setBodyTilt = gsap.quickSetter(body, "rotation") as Setter;
@@ -101,6 +121,12 @@ export function useSceneMotion(
     }
     drawAscii(PAUSED_LCD_ASCII);
 
+    function drawArms(angle: number, tilt: number) {
+      swingArmBones(angle, tilt).forEach((bone, index) => {
+        armBones[index].style.transform = armBoneMatrix(bone);
+      });
+    }
+
     function resetTransforms() {
       theta = 0;
       velocity = 0;
@@ -110,6 +136,7 @@ export function useSceneMotion(
       setPlayerX(0);
       setPlayerY(0);
       setBodyTilt(0);
+      drawArms(0, 0);
       setBack(0);
       setMiddle(0);
       setFace(0);
@@ -142,9 +169,12 @@ export function useSceneMotion(
       const radians = (theta * Math.PI) / 180;
       setPlayerX(-610 * Math.sin(radians));
       setPlayerY(610 * (Math.cos(radians) - 1));
-      setBodyTilt(
-        Math.max(-1.5, Math.min(1.5, -theta * 0.16 - velocity * 0.02)),
+      const bodyTilt = Math.max(
+        -1.5,
+        Math.min(1.5, -theta * 0.16 - velocity * 0.02),
       );
+      setBodyTilt(bodyTilt);
+      drawArms(theta, bodyTilt);
 
       setBack(Math.sin(phase * 0.22) * 8);
       setMiddle(Math.sin(phase * 0.33 + 1.2) * 13);
@@ -244,6 +274,8 @@ export function useSceneMotion(
         [
           leftRope,
           rightRope,
+          leftGrip,
+          rightGrip,
           player,
           body,
           back,

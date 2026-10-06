@@ -1,7 +1,7 @@
 {
   "name": "burpleplayer",
   "private": true,
-  "version": "0.1.1",
+  "version": "0.1.2",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -10,7 +10,8 @@
     "format": "prettier --write . && cargo fmt --manifest-path src-tauri/Cargo.toml",
     "format:check": "prettier --check . && cargo fmt --manifest-path src-tauri/Cargo.toml --check",
     "audit:contrast": "node scripts/check-contrast.mjs",
-    "build": "pnpm typecheck && vite build",
+    "audit:grip": "node scripts/check-swing-grip.mjs",
+    "build": "pnpm typecheck && pnpm audit:grip && vite build",
     "preview": "vite preview",
     "tauri": "tauri"
   },

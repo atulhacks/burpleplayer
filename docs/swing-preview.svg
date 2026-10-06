@@ -103,18 +103,26 @@
     <path d="M382 123v143" stroke="#798493" stroke-width="9" stroke-linecap="round"/>
     <path d="M380 123v143" stroke="#dbe0df" stroke-width="5" stroke-linecap="round"/>
     <path d="M378 146l7-6m-7 20 7-6m-7 20 7-6m-7 20 7-6m-7 20 7-6m-7 20 7-6m-7 20 7-6" stroke="#858e95" stroke-width="1.5" opacity=".67"/>
+    <g transform="translate(382 243) scale(0.45 .45)">
+      <path d="M-19-26q-18 1-18 24v11q0 20 20 24h24q19-4 20-24v-17q-2-22-21-23Z" fill="#772b79" stroke="#59215e" stroke-width="3"/>
+      <path d="M-5-12q14-5 26 0M-5 0q14-5 26 0M-5 12q14-5 26 0" fill="none" stroke="#59215e" stroke-width="3" stroke-linecap="round"/>
+      <path d="M-17 10q-7-12 0-19q6-4 13 4l9 13q3 9-5 13q-10 4-17-11Z" fill="#8c3886" stroke="#59215e" stroke-width="3"/>
+    </g>
   </g>
   <g class="rope-right moving">
     <path d="M578 123v143" stroke="#798493" stroke-width="9" stroke-linecap="round"/>
     <path d="M576 123v143" stroke="#dbe0df" stroke-width="5" stroke-linecap="round"/>
     <path d="M574 146l7-6m-7 20 7-6m-7 20 7-6m-7 20 7-6m-7 20 7-6m-7 20 7-6m-7 20 7-6" stroke="#858e95" stroke-width="1.5" opacity=".67"/>
+    <g transform="translate(578 243) scale(-0.45 .45)">
+      <path d="M-19-26q-18 1-18 24v11q0 20 20 24h24q19-4 20-24v-17q-2-22-21-23Z" fill="#772b79" stroke="#59215e" stroke-width="3"/>
+      <path d="M-5-12q14-5 26 0M-5 0q14-5 26 0M-5 12q14-5 26 0" fill="none" stroke="#59215e" stroke-width="3" stroke-linecap="round"/>
+      <path d="M-17 10q-7-12 0-19q6-4 13 4l9 13q3 9-5 13q-10 4-17-11Z" fill="#8c3886" stroke="#59215e" stroke-width="3"/>
+    </g>
   </g>
 
   <g class="rider moving">
     <path d="M411 222q-22 1-31 25l-8 31h30l17-37Z" fill="#f4a044"/>
     <path d="M549 222q22 1 31 25l8 31h-30l-17-37Z" fill="#f4a044"/>
-    <circle cx="382" cy="243" r="17" fill="#772b79"/>
-    <circle cx="578" cy="243" r="17" fill="#772b79"/>
     <rect x="402" y="146" width="156" height="149" rx="23" fill="url(#shell)" stroke="#d9787c" stroke-width="3"/>
     <path d="M416 155h126" stroke="#ffe4ca" stroke-width="6" opacity=".75" stroke-linecap="round"/>
     <rect x="422" y="164" width="116" height="91" rx="12" fill="#563871"/>
