@@ -304,27 +304,52 @@ function Rope({ x, top }: { x: number; top: number }) {
   );
 }
 
-function SwingRing({ x, top }: { x: number; top: number }) {
+function SwingRing({
+  x,
+  top,
+  rear = false,
+}: {
+  x: number;
+  top: number;
+  rear?: boolean;
+}) {
+  const cy = top - 52;
+  const arc = `M${x} ${cy - 33}a19 33 0 0 1 0 66`;
   return (
-    <g aria-hidden="true">
-      <ellipse
-        cx={x}
-        cy={top - 61}
-        rx="20"
-        ry="44"
-        fill="none"
-        stroke="var(--ring-shadow)"
-        strokeWidth="16"
-      />
-      <ellipse
-        cx={x - 4}
-        cy={top - 63}
-        rx="18"
-        ry="42"
-        fill="none"
-        stroke="url(#ring-gradient)"
-        strokeWidth="11"
-      />
+    <g aria-hidden="true" data-ring-side={rear ? "rear" : "front"}>
+      {rear ? (
+        <ellipse
+          cx={x}
+          cy={cy}
+          rx="19"
+          ry="33"
+          fill="none"
+          stroke="url(#ring-gradient)"
+          strokeWidth="14"
+        />
+      ) : (
+        <>
+          <path
+            d={arc}
+            fill="none"
+            stroke="var(--ring-shadow)"
+            strokeWidth="15"
+          />
+          <path
+            d={arc}
+            fill="none"
+            stroke="url(#ring-gradient)"
+            strokeWidth="11"
+          />
+          <path
+            d={`M${x + 3} ${cy - 31}a16 31 0 0 1 12 12`}
+            fill="none"
+            stroke="var(--ring-light)"
+            strokeWidth="3"
+            strokeLinecap="round"
+          />
+        </>
+      )}
     </g>
   );
 }
@@ -598,13 +623,13 @@ function Player({
       <path
         d="M525 773h24v21h21v24h-21v21h-24v-21h-22v-24h22Z"
         fill="var(--dpad-shadow)"
-        opacity="0.7"
+        opacity="0.18"
         transform="translate(2 4)"
       />
       <path
         d="M525 773h24v21h21v24h-21v21h-24v-21h-22v-24h22Z"
-        fill="url(#dpad-gradient)"
-        stroke="var(--dpad-edge)"
+        fill="url(#control-glass-gradient)"
+        stroke="var(--glass-edge)"
         strokeWidth="3"
         strokeLinejoin="round"
       />
@@ -620,15 +645,15 @@ function Player({
         cy="811"
         r="16"
         fill="var(--button-shadow)"
-        opacity="0.6"
+        opacity="0.18"
         transform="translate(2 4)"
       />
       <circle
         cx="638"
         cy="807"
         r="15"
-        fill="url(#button-gradient)"
-        stroke="var(--button-outline)"
+        fill="url(#control-glass-gradient)"
+        stroke="var(--glass-edge)"
         strokeWidth="2"
       />
       <circle
@@ -636,15 +661,15 @@ function Player({
         cy="798"
         r="16"
         fill="var(--button-shadow)"
-        opacity="0.6"
+        opacity="0.18"
         transform="translate(2 4)"
       />
       <circle
         cx="676"
         cy="794"
         r="15"
-        fill="url(#button-gradient)"
-        stroke="var(--button-outline)"
+        fill="url(#control-glass-gradient)"
+        stroke="var(--glass-edge)"
         strokeWidth="2"
       />
       <path
@@ -848,6 +873,11 @@ function SceneDefs() {
         <stop offset="0.6" className="stop-boot" />
         <stop offset="1" className="stop-boot-dark" />
       </linearGradient>
+      <linearGradient id="control-glass-gradient" x2="0.8" y2="1">
+        <stop stopColor="#ffffff" stopOpacity="0.65" />
+        <stop offset="0.45" stopColor="#ffffff" stopOpacity="0.12" />
+        <stop offset="1" stopColor="#5b3a7a" stopOpacity="0.22" />
+      </linearGradient>
       <linearGradient id="button-gradient" x2="1" y2="1">
         <stop offset="0" className="stop-button-light" />
         <stop offset="1" className="stop-button-dark" />
@@ -979,6 +1009,8 @@ export function ClayScene() {
           filter="url(#ground-soft)"
         />
         <g data-scene-layer="crossbar" aria-hidden="true">
+          <SwingRing x={433} top={270} rear />
+          <SwingRing x={723} top={291} rear />
           <path
             d="M274 173 865 210q21 1 21 22v21q0 24-24 23L278 239Z"
             fill="url(#bar-gradient)"

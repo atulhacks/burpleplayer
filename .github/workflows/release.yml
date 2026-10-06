@@ -48,7 +48,7 @@ jobs:
             linux: true
             macos: false
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7.0.1
 
       - name: Install Linux build dependencies
         if: matrix.linux
@@ -59,11 +59,11 @@ jobs:
             libdbus-1-dev librsvg2-dev libssl-dev libwebkit2gtk-4.1-dev \
             libxdo-dev patchelf wget xdg-utils
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6.1.0
         with:
           version: 11.19.0
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7.0.0
         with:
           node-version: 24
           cache: pnpm
@@ -85,6 +85,7 @@ jobs:
         env:
           APPLE_SIGNING_IDENTITY: ${{ matrix.macos && '-' || '' }}
         with:
+          retryAttempts: 2
           args: ${{ matrix.args }}
           uploadWorkflowArtifacts: true
 
@@ -98,14 +99,16 @@ jobs:
           tagName: ${{ github.ref_name }}
           releaseName: BurplePlayer ${{ github.ref_name }}
           releaseBody: |
-            First desktop preview of BurplePlayer: a local music library inside a pastel swing playground.
+            BurplePlayer desktop installers: a local music library inside a pastel swing playground.
 
             Download the DMG for your Mac architecture, the EXE or MSI for Windows x64,
             the DEB for Ubuntu x64, or the AppImage for other x64 Linux distributions.
 
             macOS builds are ad-hoc signed but not notarized. Windows installers are unsigned.
+          generateReleaseNotes: true
           releaseDraft: true
           prerelease: false
+          retryAttempts: 2
           args: ${{ matrix.args }}
 
   publish:

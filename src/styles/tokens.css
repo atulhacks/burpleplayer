@@ -72,10 +72,27 @@
   --base-dark: #c87d5a;
   --ink: #352446;
   --focus-ring: #352446;
-  --glass-fill: rgb(255 248 241 / 90%);
+  --glass-fill: rgb(255 248 241 / 58%);
   --glass-edge: rgb(255 255 255 / 88%);
-  --glass-text-soft: #604764;
+  --glass-text-soft: #44304e;
   --glass-accent: #5b3a7a;
+  --glass-chrome: linear-gradient(
+    135deg,
+    rgb(255 255 255 / 32%),
+    rgb(255 248 241 / 12%)
+  );
+  --glass-control: linear-gradient(
+    135deg,
+    rgb(255 255 255 / 38%),
+    rgb(255 255 255 / 12%)
+  );
+  --glass-control-active: linear-gradient(
+    135deg,
+    rgb(255 255 255 / 50%),
+    rgb(91 58 122 / 18%)
+  );
+  --glass-control-shadow:
+    0 3px 8px rgb(53 36 70 / 10%), inset 0 1px 1px rgb(255 255 255 / 70%);
 
   --radius-toy: 24px;
   --radius-panel: 28px;

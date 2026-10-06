@@ -274,3 +274,9 @@
   fill: var(--cube-face);
   filter: brightness(0.78);
 }
+
+@media (prefers-reduced-transparency: reduce) {
+  #control-glass-gradient stop {
+    stop-opacity: 1;
+  }
+}

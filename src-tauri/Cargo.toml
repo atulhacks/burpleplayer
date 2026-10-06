@@ -1,6 +1,6 @@
 [package]
 name = "burpleplayer"
-version = "0.1.0"
+version = "0.1.1"
 description = "A pastel clay-toy desktop music player"
 authors = ["BurplePlayer contributors"]
 edition = "2021"

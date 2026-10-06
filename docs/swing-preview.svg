@@ -92,6 +92,10 @@
   <rect x="726" y="39" width="77" height="277" rx="19" fill="url(#coral)"/>
   <path d="M741 51v245" stroke="#ffd0d5" stroke-width="8" opacity=".34" stroke-linecap="round"/>
   <rect x="726" y="185" width="77" height="34" rx="10" fill="#a8e47d"/>
+  <g fill="none" stroke="url(#metal)" stroke-width="8">
+    <ellipse cx="382" cy="97" rx="12" ry="20"/>
+    <ellipse cx="578" cy="97" rx="12" ry="20"/>
+  </g>
   <rect x="211" y="79" width="538" height="35" rx="16" fill="url(#bar)"/>
   <path d="M228 86h502" stroke="#ffd0c9" stroke-width="5" opacity=".46" stroke-linecap="round"/>
 
@@ -127,9 +131,9 @@
     <path d="M433 310h32m30 0h32" stroke="#ab4a9d" stroke-width="3" opacity=".6" stroke-linecap="round"/>
   </g>
 
-  <g fill="none" stroke="url(#metal)" stroke-width="12">
-    <ellipse cx="382" cy="96" rx="17" ry="29"/>
-    <ellipse cx="578" cy="96" rx="17" ry="29"/>
+  <g fill="none" stroke="url(#metal)" stroke-width="8">
+    <path d="M382 77a12 20 0 0 1 0 40"/>
+    <path d="M578 77a12 20 0 0 1 0 40"/>
   </g>
   <g fill="none" stroke="#f3f4ed" stroke-width="3" opacity=".72">
     <path d="M370 80q-10 18 1 35"/>

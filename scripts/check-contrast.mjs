@@ -37,17 +37,31 @@ function contrast(foreground, background) {
   return (values[0] + 0.05) / (values[1] + 0.05);
 }
 
-const glassOnSky = blend(color("#fff8f1"), color("--sky-top"), 0.9);
-const glassOnGround = blend(color("#fff8f1"), color("--ground"), 0.9);
-const dockOnGround = blend(color("#ffddc9"), color("--ground"), 0.9);
+const glassOnSky = blend(color("#fff8f1"), color("--sky-top"), 0.58);
+const glassOnGround = blend(color("#fff8f1"), color("--ground"), 0.58);
+const dockOnGround = blend(color("#fff8f1"), color("--ground"), 0.12);
 const checks = [
   ["title on blue sky", color("--ink"), color("--sky-top")],
   ["LCD ink on screen", color("--lcd-ink"), color("--lcd-screen")],
   ["glass secondary text on sky", color("--glass-text-soft"), glassOnSky],
   ["glass secondary text on ground", color("--glass-text-soft"), glassOnGround],
-  ["panel action text", color("#fffaf5"), color("--plum")],
+  [
+    "glass control on lavender",
+    color("--ink"),
+    blend(color("#ffffff"), color("--pillar-lavender"), 0.12),
+  ],
+  [
+    "panel text on lavender",
+    color("--glass-text-soft"),
+    blend(color("#fff8f1"), color("--pillar-lavender"), 0.58),
+  ],
+  [
+    "panel text on coral",
+    color("--glass-text-soft"),
+    blend(color("#fff8f1"), color("--pillar-coral"), 0.58),
+  ],
   ["empty-state accent", color("#754283"), glassOnSky],
-  ["ASCII empty art", color("#77538a"), glassOnSky],
+  ["ASCII empty art", color("--glass-text-soft"), glassOnSky],
   ["dock artist", color("#654964"), dockOnGround],
 ];
 

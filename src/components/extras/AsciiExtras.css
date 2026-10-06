@@ -12,7 +12,7 @@
 .ascii-empty {
   max-width: 100%;
   overflow: hidden;
-  color: #77538a;
+  color: var(--glass-text-soft);
   text-align: left;
 }
 
