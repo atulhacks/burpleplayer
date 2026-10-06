@@ -2,6 +2,12 @@ name: Desktop release
 
 on:
   workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Existing v* tag to rebuild an unpublished draft release; leave empty for a test build
+        required: false
+        type: string
+        default: ""
   push:
     tags:
       - "v*"
@@ -10,7 +16,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: desktop-release-${{ github.ref }}
+  group: desktop-release-${{ inputs.release_tag || github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -49,6 +55,8 @@ jobs:
             macos: false
     steps:
       - uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ inputs.release_tag && format('refs/tags/{0}', inputs.release_tag) || github.ref }}
 
       - name: Install Linux build dependencies
         if: matrix.linux
@@ -59,14 +67,20 @@ jobs:
             libdbus-1-dev librsvg2-dev libssl-dev libwebkit2gtk-4.1-dev \
             libxdo-dev patchelf wget xdg-utils
 
-      - uses: pnpm/action-setup@v6.1.0
-        with:
-          version: 11.19.0
-
       - uses: actions/setup-node@v7.0.0
         with:
           node-version: 24
-          cache: pnpm
+
+      - uses: pnpm/action-setup@v6.1.0
+        with:
+          version: 11.19.0
+          cache: true
+
+      - name: Verify release tag matches app version
+        if: github.event_name == 'push' || inputs.release_tag != ''
+        env:
+          RELEASE_TAG: ${{ inputs.release_tag || github.ref_name }}
+        run: node -e "if (process.env.RELEASE_TAG !== 'v' + require('./package.json').version) process.exit(1)"
 
       - uses: dtolnay/rust-toolchain@stable
         with:
@@ -80,7 +94,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build test artifacts
-        if: github.event_name == 'workflow_dispatch'
+        if: github.event_name == 'workflow_dispatch' && inputs.release_tag == ''
         uses: tauri-apps/tauri-action@v1
         env:
           APPLE_SIGNING_IDENTITY: ${{ matrix.macos && '-' || '' }}
@@ -90,14 +104,14 @@ jobs:
           uploadWorkflowArtifacts: true
 
       - name: Build release artifacts
-        if: github.event_name == 'push'
+        if: github.event_name == 'push' || inputs.release_tag != ''
         uses: tauri-apps/tauri-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           APPLE_SIGNING_IDENTITY: ${{ matrix.macos && '-' || '' }}
         with:
-          tagName: ${{ github.ref_name }}
-          releaseName: BurplePlayer ${{ github.ref_name }}
+          tagName: ${{ inputs.release_tag || github.ref_name }}
+          releaseName: BurplePlayer ${{ inputs.release_tag || github.ref_name }}
           releaseBody: |
             BurplePlayer desktop installers: a local music library inside a pastel swing playground.
 
@@ -113,7 +127,7 @@ jobs:
 
   publish:
     name: Publish verified release
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' || inputs.release_tag != ''
     needs: build
     runs-on: ubuntu-22.04
     permissions:
@@ -123,5 +137,5 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
-          TAG: ${{ github.ref_name }}
+          TAG: ${{ inputs.release_tag || github.ref_name }}
         run: gh release edit "$TAG" --draft=false

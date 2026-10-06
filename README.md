@@ -28,7 +28,7 @@ Get installers from [GitHub Releases](https://github.com/atulhacks/burpleplayer/
 | Ubuntu x64                         | `.deb`                 |
 | Other x64 Linux distributions      | `.AppImage`            |
 
-The [desktop release workflow](.github/workflows/release.yml) builds each architecture on a native GitHub runner. A pushed `v*` tag creates a draft release and publishes it only when every platform build succeeds; a manual workflow run builds test artifacts without creating a public release. The macOS bundles are ad-hoc signed, not notarized; Windows installers are unsigned.
+The [desktop release workflow](.github/workflows/release.yml) builds each architecture on a native GitHub runner. A pushed `v*` tag creates a draft release and publishes it only when every platform build succeeds; a manual workflow run builds test artifacts without creating a public release. To recover an unpublished draft after a workflow fix, provide its existing tag in the manual run’s `release_tag` input. The macOS bundles are ad-hoc signed, not notarized; Windows installers are unsigned.
 
 ## What works
 
