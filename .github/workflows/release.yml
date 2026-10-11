@@ -9,6 +9,8 @@ on:
         type: string
         default: ""
   push:
+    branches:
+      - main
     tags:
       - "v*"
 
@@ -75,7 +77,7 @@ jobs:
         run: npm install --global pnpm@11.19.0
 
       - name: Verify release tag matches app version
-        if: github.event_name == 'push' || inputs.release_tag != ''
+        if: startsWith(github.ref, 'refs/tags/v') || inputs.release_tag != ''
         env:
           RELEASE_TAG: ${{ inputs.release_tag || github.ref_name }}
         run: node -e "if (process.env.RELEASE_TAG !== 'v' + require('./package.json').version) process.exit(1)"
@@ -92,7 +94,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build test artifacts
-        if: github.event_name == 'workflow_dispatch' && inputs.release_tag == ''
+        if: ${{ !startsWith(github.ref, 'refs/tags/v') && inputs.release_tag == '' }}
         uses: tauri-apps/tauri-action@v1
         env:
           APPLE_SIGNING_IDENTITY: ${{ matrix.macos && '-' || '' }}
@@ -102,7 +104,7 @@ jobs:
           uploadWorkflowArtifacts: true
 
       - name: Build release artifacts
-        if: github.event_name == 'push' || inputs.release_tag != ''
+        if: startsWith(github.ref, 'refs/tags/v') || inputs.release_tag != ''
         uses: tauri-apps/tauri-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -125,7 +127,7 @@ jobs:
 
   publish:
     name: Publish verified release
-    if: github.event_name == 'push' || inputs.release_tag != ''
+    if: startsWith(github.ref, 'refs/tags/v') || inputs.release_tag != ''
     needs: build
     runs-on: ubuntu-22.04
     permissions:
