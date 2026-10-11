@@ -5,7 +5,7 @@ import { LottieArt } from "./components/extras/LottieArt";
 import { LibraryPanel } from "./components/panels/LibraryPanel";
 import { QueuePanel } from "./components/panels/QueuePanel";
 import { SettingsPanel } from "./components/panels/SettingsPanel";
-import { ClayScene } from "./components/scene/ClayScene";
+import { DancerScene } from "./components/scene/DancerScene";
 import { usePlayerBridge } from "./lib/usePlayerBridge";
 import { useAppStore } from "./store/appStore";
 import type { AppView } from "./store/appStore";
@@ -70,7 +70,33 @@ export default function App() {
     const swing = scene?.querySelector<SVGGElement>(
       '[data-scene-layer="swing"]',
     );
-    if (!wipe || !panel || !left || !right || !crossbar || !swing) return;
+    if (!wipe || !panel) return;
+    if (!left || !right || !crossbar || !swing) {
+      timelineRef.current?.kill();
+      if (view === renderedRef.current) return;
+      const focusPanel =
+        document.activeElement?.classList.contains("dancer-hotspot");
+      const timeline = gsap.timeline({
+        onComplete: () => {
+          timelineRef.current = null;
+          if (focusPanel && view !== "now-playing")
+            panel
+              .querySelector<HTMLElement>(".view-panel h2")
+              ?.focus({ preventScroll: true });
+        },
+      });
+      timeline
+        .to(panel, { opacity: 0, duration: 0.08, ease: "none" })
+        .call(() => {
+          renderedRef.current = view;
+          setRenderedView(view);
+        })
+        .to(panel, { opacity: 1, duration: 0.12, ease: "none" });
+      timelineRef.current = timeline;
+      return () => {
+        timeline.kill();
+      };
+    }
     if (view === renderedRef.current && !timelineRef.current) return;
 
     timelineRef.current?.kill();
@@ -292,7 +318,7 @@ export default function App() {
         ref={sceneRef}
         inert={renderedView !== "now-playing"}
       >
-        <ClayScene />
+        <DancerScene />
       </div>
       <div className="view-space" ref={panelRef}>
         {renderedView === "library" && <LibraryPanel />}

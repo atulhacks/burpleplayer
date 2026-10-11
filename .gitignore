@@ -10,6 +10,11 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+
+# Local authoring files and generated review artifacts
+.serena/
+design/blender/
+docs/
 *.local
 
 # Editor directories and files

@@ -6,52 +6,62 @@ use crate::audio::{Action, EngineHandle};
 use crate::library::Library;
 use crate::models::{AlbumArt, PlaybackState, Playlist, Track};
 
-fn send(engine: State<'_, EngineHandle>, action: Action) -> Result<PlaybackState, String> {
-    engine.request(action)
+async fn send(engine: State<'_, EngineHandle>, action: Action) -> Result<PlaybackState, String> {
+    let handle = engine.inner().clone();
+    // Audio requests can wait on native media/output work; never occupy the UI thread.
+    tauri::async_runtime::spawn_blocking(move || handle.request(action))
+        .await
+        .map_err(|error| error.to_string())?
 }
 
 #[tauri::command]
-pub fn playback_state(engine: State<'_, EngineHandle>) -> Result<PlaybackState, String> {
-    send(engine, Action::Snapshot)
+pub async fn playback_state(engine: State<'_, EngineHandle>) -> Result<PlaybackState, String> {
+    send(engine, Action::Snapshot).await
 }
 
 #[tauri::command]
-pub fn play(engine: State<'_, EngineHandle>) -> Result<PlaybackState, String> {
-    send(engine, Action::Play)
+pub async fn play(engine: State<'_, EngineHandle>) -> Result<PlaybackState, String> {
+    send(engine, Action::Play).await
 }
 
 #[tauri::command]
-pub fn pause(engine: State<'_, EngineHandle>) -> Result<PlaybackState, String> {
-    send(engine, Action::Pause)
+pub async fn pause(engine: State<'_, EngineHandle>) -> Result<PlaybackState, String> {
+    send(engine, Action::Pause).await
 }
 
 #[tauri::command]
-pub fn toggle_playback(engine: State<'_, EngineHandle>) -> Result<PlaybackState, String> {
-    send(engine, Action::Toggle)
+pub async fn toggle_playback(engine: State<'_, EngineHandle>) -> Result<PlaybackState, String> {
+    send(engine, Action::Toggle).await
 }
 
 #[tauri::command]
-pub fn seek(position_ms: u64, engine: State<'_, EngineHandle>) -> Result<PlaybackState, String> {
-    send(engine, Action::Seek(position_ms))
+pub async fn seek(
+    position_ms: u64,
+    engine: State<'_, EngineHandle>,
+) -> Result<PlaybackState, String> {
+    send(engine, Action::Seek(position_ms)).await
 }
 
 #[tauri::command]
-pub fn set_volume(volume: f32, engine: State<'_, EngineHandle>) -> Result<PlaybackState, String> {
-    send(engine, Action::Volume(volume))
+pub async fn set_volume(
+    volume: f32,
+    engine: State<'_, EngineHandle>,
+) -> Result<PlaybackState, String> {
+    send(engine, Action::Volume(volume)).await
 }
 
 #[tauri::command]
-pub fn next(engine: State<'_, EngineHandle>) -> Result<PlaybackState, String> {
-    send(engine, Action::Next)
+pub async fn next(engine: State<'_, EngineHandle>) -> Result<PlaybackState, String> {
+    send(engine, Action::Next).await
 }
 
 #[tauri::command]
-pub fn prev(engine: State<'_, EngineHandle>) -> Result<PlaybackState, String> {
-    send(engine, Action::Previous)
+pub async fn prev(engine: State<'_, EngineHandle>) -> Result<PlaybackState, String> {
+    send(engine, Action::Previous).await
 }
 
 #[tauri::command]
-pub fn load_queue(
+pub async fn load_queue(
     track_ids: Vec<i64>,
     start_index: usize,
     library: State<'_, Library>,
@@ -61,11 +71,11 @@ pub fn load_queue(
         .into_iter()
         .map(|id| library.track(id))
         .collect::<Result<Vec<_>, _>>()?;
-    send(engine, Action::Load(tracks, start_index))
+    send(engine, Action::Load(tracks, start_index)).await
 }
 
 #[tauri::command]
-pub fn enqueue(
+pub async fn enqueue(
     track_ids: Vec<i64>,
     library: State<'_, Library>,
     engine: State<'_, EngineHandle>,
@@ -74,32 +84,32 @@ pub fn enqueue(
         .into_iter()
         .map(|id| library.track(id))
         .collect::<Result<Vec<_>, _>>()?;
-    send(engine, Action::Enqueue(tracks))
+    send(engine, Action::Enqueue(tracks)).await
 }
 
 #[tauri::command]
-pub fn remove_from_queue(
+pub async fn remove_from_queue(
     index: usize,
     engine: State<'_, EngineHandle>,
 ) -> Result<PlaybackState, String> {
-    send(engine, Action::Remove(index))
+    send(engine, Action::Remove(index)).await
 }
 
 #[tauri::command]
-pub fn move_in_queue(
+pub async fn move_in_queue(
     from: usize,
     to: usize,
     engine: State<'_, EngineHandle>,
 ) -> Result<PlaybackState, String> {
-    send(engine, Action::Move(from, to))
+    send(engine, Action::Move(from, to)).await
 }
 
 #[tauri::command]
-pub fn jump_to_queue_index(
+pub async fn jump_to_queue_index(
     index: usize,
     engine: State<'_, EngineHandle>,
 ) -> Result<PlaybackState, String> {
-    send(engine, Action::Jump(index))
+    send(engine, Action::Jump(index)).await
 }
 
 #[tauri::command]

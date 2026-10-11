@@ -9,12 +9,10 @@
 </p>
 
 <p align="center">
-  <strong>Tauri 2</strong> · <strong>Rust audio</strong> · <strong>React + TypeScript</strong> · <strong>SVG + GSAP</strong>
+  <strong>Tauri 2</strong> · <strong>Rust audio</strong> · <strong>React + TypeScript</strong> · <strong>Blender + Three.js + GSAP</strong>
 </p>
 
-![Animated illustration of the BurplePlayer character on its swing](docs/swing-preview.svg)
-
-The scene is the interface: the pink console swings between two pillars, its LCD shows the current track and spectrum, and the little cubes on the ground represent the next songs in the queue. The visual direction comes from [`design/reference.png`](design/reference.png); the app itself is hand-built SVG and CSS, not a background image.
+The scene is the interface: the pink console swings between two pillars, hops down to dance during playback, and returns to its ropes when paused. Its LCD shows the current track and spectrum; the little ground cubes represent upcoming songs. The Blender-modeled playground and character are rendered live with Three.js—not a video or background image. Smooth tapered arms, forearm-aligned wrists, molded boots, and planted-foot motion retain the reviewed Blender poses. The SVG scene remains a lightweight fallback when WebGL is unavailable.
 
 ## Download
 
@@ -37,18 +35,10 @@ The [desktop release workflow](.github/workflows/release.yml) builds each archit
 | Playback      | Local MP3, FLAC, WAV, Ogg, and AAC decoding; play/pause, seek, volume, previous/next, queue jumping, OS media controls                     |
 | Library       | Native folder picker, recursive scans, tags and artwork, album/artist/folder browsing, search, SQLite persistence, playlists and Favorites |
 | Scene         | Live LCD face, track text and 16-band spectrum; a ring-anchored pendulum, drifting clouds, reactive queue cubes, day/twilight themes       |
-| Views         | Now Playing, Library, Queue, and Settings with an interruptible cloud-wipe transition and tinted glass panels                              |
+| Views         | Now Playing, Library, Queue, and Settings with opening pillars, interruptible panel fades, and tinted glass controls                       |
 | Accessibility | Keyboard controls, visible focus, labeled controls, reduced-motion override, static animation fallbacks, contrast audit                    |
 
 The Rust backend owns audio, the queue, and the library. React sends typed Tauri commands and renders backend snapshots and events; it never reads audio files directly.
-
-## Screenshots
-
-macOS release build, with the native titlebar cropped:
-
-| Now Playing                                                                                                      | Queue                                                                                              |
-| ---------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| <img src="docs/screenshots/now-playing.jpg" alt="The console between pastel pillars in Now Playing" width="320"> | <img src="docs/screenshots/queue.jpg" alt="The glass Queue panel over the playground" width="320"> |
 
 ## Run locally
 
@@ -96,11 +86,7 @@ The dock expands to show seek and volume sliders. Library supports song search, 
 | `src-tauri/src/library/`   | Lofty tags/artwork, WalkDir scanning, SQLite library and playlists                 |
 | `src-tauri/src/ipc/`       | Tauri commands and event payloads                                                  |
 
-The bundle identifier is `com.burpleplayer.desktop`. On first launch, an existing `com.burpleplayer.app` SQLite library is copied into the new app-data location without changing the old database. [`src-tauri/src/README.md`](src-tauri/src/README.md) documents the command and event contract.
-
-## Accessibility
-
-Keyboard navigation, visible focus rings, and reduced-motion controls are available throughout the app. Choose System, Full, or Reduced motion in Settings; the LCD continues to update in reduced mode.
+The bundle identifier is `com.burpleplayer.desktop`. On first launch, an existing `com.burpleplayer.app` SQLite library is copied into the new app-data location without changing the old database.
 
 ## Development
 
@@ -108,10 +94,15 @@ Keyboard navigation, visible focus rings, and reduced-motion controls are availa
 pnpm typecheck
 pnpm lint
 pnpm format:check
+pnpm audit:scene
 pnpm build
 cargo test --manifest-path src-tauri/Cargo.toml
 ```
 
 ## Credits
 
-[Fredoka](https://github.com/google/fonts/tree/main/ofl/fredoka) and [Press Start 2P](https://github.com/google/fonts/tree/main/ofl/pressstart2p) are bundled locally with their SIL Open Font License files. The app icon and swing illustration are included in this repository.
+[Fredoka](https://github.com/google/fonts/tree/main/ofl/fredoka) and [Press Start 2P](https://github.com/google/fonts/tree/main/ofl/pressstart2p) are bundled locally with their SIL Open Font License files. The app icon and runtime scene assets are included in this repository.
+
+## Motion and accessibility
+
+Keyboard navigation, visible focus rings, and reduced-motion controls are available throughout the app. Choose System, Full, or Reduced motion in Settings; the LCD continues to update in reduced mode.

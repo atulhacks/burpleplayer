@@ -1,4 +1,7 @@
 design/reference.png
+.serena/
+design/blender/
+public/models/*.bin
 src-tauri/icons/
 src-tauri/gen/
 src-tauri/target/

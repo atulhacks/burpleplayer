@@ -1167,14 +1167,14 @@ a:focus-visible {
   border-left: 0;
 }
 
-.app-shell button:not(.scene-hotspot) {
+.app-shell button:not(.scene-hotspot):not(.dancer-hotspot) {
   border: 1px solid rgb(255 255 255 / 65%);
   background: var(--glass-control);
   box-shadow: var(--glass-control-shadow);
   color: var(--ink);
 }
 
-.app-shell button:not(.scene-hotspot):hover {
+.app-shell button:not(.scene-hotspot):not(.dancer-hotspot):hover {
   background: var(--glass-control-active);
 }
 
@@ -1229,7 +1229,7 @@ a:focus-visible {
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
   }
-  .app-shell button:not(.scene-hotspot) {
+  .app-shell button:not(.scene-hotspot):not(.dancer-hotspot) {
     background: #fff8f1;
   }
   .app-shell button[aria-current="page"],

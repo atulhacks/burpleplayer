@@ -1,0 +1,102 @@
+{
+  "version": 1,
+  "fps": 30,
+  "frames": 601,
+  "stride": 25950,
+  "transforms": [
+    "Runtime bone \u2022 Hand_L",
+    "Runtime bone \u2022 Hand_R",
+    "Runtime bone \u2022 Foot_L",
+    "Runtime bone \u2022 Foot_R",
+    "Rig_Swing",
+    "Left snug silver collar",
+    "Left rope \u2022 cotton strand 1",
+    "Left rope \u2022 cotton strand 2",
+    "Left rope \u2022 cotton strand 3",
+    "Left seat eyelet",
+    "Right snug silver collar",
+    "Right rope \u2022 cotton strand 1",
+    "Right rope \u2022 cotton strand 2",
+    "Right rope \u2022 cotton strand 3",
+    "Right seat eyelet",
+    "Swing seat \u2022 rounded plank",
+    "Plum seat end cap",
+    "Plum seat end cap.001",
+    "Console \u2022 molded salmon shell",
+    "Console \u2022 left front case seam",
+    "Console \u2022 top case seam",
+    "LCD \u2022 raised purple bezel",
+    "LCD \u2022 recessed cyan screen",
+    "LCD \u2022 pixel eye",
+    "LCD \u2022 pixel eye.001",
+    "LCD \u2022 smile pixel",
+    "LCD \u2022 smile pixel.001",
+    "LCD \u2022 smile pixel.002",
+    "LCD \u2022 smile pixel.003",
+    "LCD \u2022 smile pixel.004",
+    "LCD \u2022 smile corner",
+    "LCD \u2022 smile corner.001",
+    "D-pad \u2022 one molded cross",
+    "A \u2022 berry button",
+    "B \u2022 berry button",
+    "Speaker grille \u2022 slot 1",
+    "Speaker grille \u2022 slot 2",
+    "Speaker grille \u2022 slot 3",
+    "Speaker grille \u2022 slot 4",
+    "Speaker grille \u2022 slot 5",
+    "Speaker grille \u2022 slot 6",
+    "Speaker grille \u2022 slot 7",
+    "Speaker grille \u2022 slot 8",
+    "Speaker grille \u2022 slot 9",
+    "Rig_Character",
+    "Rig_Body",
+    "Rig_Arm_L",
+    "Rig_Arm_R",
+    "Rig_Foot_L",
+    "Rig_Foot_R",
+    "Control_up",
+    "Control_down",
+    "Control_previous",
+    "Control_next",
+    "Control_toggle",
+    "Control_queue",
+    "Rig_Display"
+  ],
+  "arms": [
+    {
+      "name": "Arm \u2022 uninterrupted clay curve L",
+      "radii": [0.10191999359607706, 0.09799999743700027, 0.08623999727725984],
+      "offset": 912
+    },
+    {
+      "name": "Arm \u2022 uninterrupted clay curve R",
+      "radii": [0.10191999359607706, 0.09799999743700027, 0.08623999727725984],
+      "offset": 939
+    }
+  ],
+  "legs": [
+    {
+      "name": "Skin \u2022 leg L",
+      "vertices": 2082,
+      "offset": 966
+    },
+    {
+      "name": "Skin \u2022 leg R",
+      "vertices": 2082,
+      "offset": 13458
+    }
+  ],
+  "source": "burple-arms-polished.blend",
+  "coordinates": "Y-up / x,z,-y",
+  "clips": {
+    "departure": [1.2, 2.9],
+    "dance": [2.9, 14.9],
+    "return": [15.4, 17.4]
+  },
+  "encoding": "delta-i16",
+  "scale": 4096,
+  "encodedBytes": 31191900,
+  "maximumQuantizationError": 0.0001220703125,
+  "rawBytes": 62383800,
+  "compressedBytes": 12683673
+}

@@ -1,0 +1,82 @@
+.dancer-stage {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: max(100%, calc(100vh * 0.77174));
+  height: max(100%, calc(100vw * 1.29578));
+  transform: translate(-50%, -50%);
+  background: linear-gradient(var(--sky-top), var(--sky-bottom));
+}
+.dancer-canvas,
+.dancer-hotspots {
+  position: absolute;
+  inset: 0;
+}
+.dancer-canvas canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.dancer-hotspots {
+  pointer-events: none;
+}
+.dancer-hotspot {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 50%;
+  padding: 0;
+  background: transparent;
+  pointer-events: auto;
+  cursor: pointer;
+  visibility: hidden;
+}
+.dancer-hotspot--cube {
+  width: 35px;
+  height: 35px;
+  border-radius: 9px;
+}
+.dancer-hotspot:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+  background: rgb(255 255 255 / 25%);
+}
+@media (hover: hover) and (pointer: fine) {
+  .dancer-hotspot:hover {
+    background: rgb(255 255 255 / 20%);
+  }
+}
+.dancer-caption {
+  position: absolute;
+  top: 32%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  pointer-events: none;
+  font-size: 10px;
+  color: var(--ink);
+  text-shadow: 0 1px 2px rgb(255 255 255 / 80%);
+}
+.dancer-caption button {
+  pointer-events: auto;
+  border: 1px solid rgb(255 255 255 / 75%);
+  border-radius: 99px;
+  background: rgb(255 255 255 / 24%);
+  color: var(--ink);
+  padding: 5px 12px;
+  backdrop-filter: blur(8px);
+  cursor: pointer;
+}
+.dancer-notice {
+  position: absolute;
+  top: 70%;
+  left: 20%;
+  font-size: 10px;
+}
